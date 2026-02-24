@@ -1,0 +1,59 @@
+{
+  "address": "Grand-Place - Grote Markt, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien",
+  "latitude": 50.8467887,
+  "longitude": 4.3524356,
+  "radius_km": 0.5,
+  "zoom_levels": [
+    17,
+    18
+  ],
+  "map_types": [
+    "satellite",
+    "roadmap"
+  ],
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/satellite/1000_région_de_bruxelles-capitale_-_brussels_hoofd",
+  "total_images": 4,
+  "download_timestamp": "2026-01-22T15:41:32.765990",
+  "maps_metadata": {
+    "zoom_17_satellite": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.3770472947296881,
+      "tile_coverage_m": 241.3102686270004,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_17_roadmap": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.3770472947296881,
+      "tile_coverage_m": 241.3102686270004,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_18_satellite": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18852364736484406,
+      "tile_coverage_m": 120.6551343135002,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    },
+    "zoom_18_roadmap": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18852364736484406,
+      "tile_coverage_m": 120.6551343135002,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    }
+  }
+}

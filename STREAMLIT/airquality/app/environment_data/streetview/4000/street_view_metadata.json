@@ -1,0 +1,18 @@
+{
+  "address": "Sart-Tilman CHU - Escaliers, Avenue Hippocrate, Angleur, Liège, Wallonie, 4000, Belgique",
+  "latitude": 50.5739954,
+  "longitude": 5.5671504,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 5,
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/4000",
+  "download_timestamp": "2026-01-27T12:36:07.043493",
+  "downloaded_files": [
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/4000/street_01_20260127_123605_h135.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/4000/street_02_20260127_123605_h180.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/4000/street_03_20260127_123606_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/4000/street_04_20260127_123606_h45.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/4000/street_05_20260127_123607_h45.jpg"
+  ]
+}

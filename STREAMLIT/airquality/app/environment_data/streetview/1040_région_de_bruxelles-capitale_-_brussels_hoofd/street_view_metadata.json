@@ -1,0 +1,18 @@
+{
+  "address": "Tête olmèque No.8, Chaussée de La Hulpe, Coin du Balai, Boitsfort, Watermael-Boitsfort, Bruxelles-Capitale, 1170, Belgique",
+  "latitude": 50.7947106,
+  "longitude": 4.410281,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 5,
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1040_région_de_bruxelles-capitale_-_brussels_hoofd",
+  "download_timestamp": "2026-01-12T00:37:46.725364",
+  "downloaded_files": [
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1040_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_20260112_003744_h180.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1040_région_de_bruxelles-capitale_-_brussels_hoofd/street_02_20260112_003745_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1040_région_de_bruxelles-capitale_-_brussels_hoofd/street_03_20260112_003745_h315.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1040_région_de_bruxelles-capitale_-_brussels_hoofd/street_04_20260112_003746_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1040_région_de_bruxelles-capitale_-_brussels_hoofd/street_05_20260112_003746_h90.jpg"
+  ]
+}

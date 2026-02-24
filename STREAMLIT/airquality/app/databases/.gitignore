@@ -1,0 +1,8 @@
+# Ignorer toutes les bases de données
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Sauf un fichier README
+!README.md

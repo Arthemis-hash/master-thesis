@@ -1,0 +1,59 @@
+{
+  "address": "1050 Région De Bruxelles-Capitale - Brussels Hoofd",
+  "latitude": 50.8235717,
+  "longitude": 4.3766927,
+  "radius_km": 0.3,
+  "zoom_levels": [
+    17,
+    18
+  ],
+  "map_types": [
+    "satellite",
+    "roadmap"
+  ],
+  "output_directory": "environment_data/satellite/1050_1050_région_de_bruxelles-capitale_-_brussels_",
+  "total_images": 4,
+  "download_timestamp": "2025-11-22T19:54:15.616242",
+  "maps_metadata": {
+    "zoom_17_satellite": {
+      "grid_size": 3,
+      "resolution_m_per_px": 0.3772349087249509,
+      "tile_coverage_m": 241.43034158396858,
+      "total_tiles": 9,
+      "image_size": [
+        1920,
+        1920
+      ]
+    },
+    "zoom_17_roadmap": {
+      "grid_size": 3,
+      "resolution_m_per_px": 0.3772349087249509,
+      "tile_coverage_m": 241.43034158396858,
+      "total_tiles": 9,
+      "image_size": [
+        1920,
+        1920
+      ]
+    },
+    "zoom_18_satellite": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.18861745436247546,
+      "tile_coverage_m": 120.71517079198429,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_18_roadmap": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.18861745436247546,
+      "tile_coverage_m": 120.71517079198429,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    }
+  }
+}

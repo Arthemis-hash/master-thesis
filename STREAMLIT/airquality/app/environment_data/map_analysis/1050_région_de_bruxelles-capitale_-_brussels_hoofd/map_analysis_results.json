@@ -1,0 +1,18 @@
+{
+  "roads": {
+    "mask": "[[  0   0   0 ...   0   0   0]\n [  0   0   0 ...   0   0   0]\n [  0   0   0 ...   0   0   0]\n ...\n [255 255 255 ...   0   0   0]\n [255 255 255 ...   0   0   0]\n [255 255 255 ...   0   0   0]]",
+    "metrics": "DetectionMetrics(coverage_percent=28.030996093749998, pixel_count=2870374, total_pixels=10240000, area_m2=1033334.64, perimeter_pixels=85157, num_regions=79, avg_region_size=36333.84810126582)"
+  },
+  "green_spaces": {
+    "mask": "[[0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]\n ...\n [0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]]",
+    "metrics": "DetectionMetrics(coverage_percent=0.0, pixel_count=0, total_pixels=10240000, area_m2=0.0, perimeter_pixels=0, num_regions=0, avg_region_size=0)"
+  },
+  "water": {
+    "mask": "[[0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]\n ...\n [0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]\n [0 0 0 ... 0 0 0]]",
+    "metrics": "DetectionMetrics(coverage_percent=0.0, pixel_count=0, total_pixels=10240000, area_m2=0.0, perimeter_pixels=0, num_regions=0, avg_region_size=0)"
+  },
+  "buildings": {
+    "mask": "[[255 255 255 ... 255 255 255]\n [255 255 255 ... 255 255 255]\n [255 255 255 ... 255 255 255]\n ...\n [  0   0   0 ... 255 255 255]\n [  0   0   0 ... 255 255 255]\n [  0   0   0 ... 255 255 255]]",
+    "metrics": "DetectionMetrics(coverage_percent=71.848271484375, pixel_count=7357263, total_pixels=10240000, area_m2=2648614.6799999997, perimeter_pixels=148897, num_regions=150, avg_region_size=49048.42)"
+  }
+}

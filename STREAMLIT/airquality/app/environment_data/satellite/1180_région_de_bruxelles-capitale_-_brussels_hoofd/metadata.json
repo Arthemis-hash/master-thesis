@@ -1,0 +1,59 @@
+{
+  "address": "835, Chaussée d'Alsemberg - Alsembergsesteenweg, Globe, Uccle - Ukkel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1180, België / Belgique / Belgien",
+  "latitude": 50.8012799,
+  "longitude": 4.3363205,
+  "radius_km": 0.5,
+  "zoom_levels": [
+    17,
+    18
+  ],
+  "map_types": [
+    "satellite",
+    "roadmap"
+  ],
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/satellite/1180_région_de_bruxelles-capitale_-_brussels_hoofd",
+  "total_images": 4,
+  "download_timestamp": "2026-01-12T01:07:13.622413",
+  "maps_metadata": {
+    "zoom_17_satellite": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.37741498799455286,
+      "tile_coverage_m": 241.54559231651382,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_17_roadmap": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.37741498799455286,
+      "tile_coverage_m": 241.54559231651382,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_18_satellite": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18870749399727643,
+      "tile_coverage_m": 120.77279615825691,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    },
+    "zoom_18_roadmap": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18870749399727643,
+      "tile_coverage_m": 120.77279615825691,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    }
+  }
+}

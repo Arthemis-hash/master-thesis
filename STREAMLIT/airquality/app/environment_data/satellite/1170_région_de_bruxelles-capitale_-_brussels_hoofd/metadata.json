@@ -1,0 +1,59 @@
+{
+  "address": "Tête olmèque No.8 - Olmeekse hoofd nr.8, Chaussée de La Hulpe - Terhulpsesteenweg, Boitsfort - Bosvoorde, Watermael-Boitsfort - Watermaal-Bosvoorde, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1170, België / Belgique / Belgien",
+  "latitude": 50.7945508,
+  "longitude": 4.4170544,
+  "radius_km": 0.5,
+  "zoom_levels": [
+    17,
+    18
+  ],
+  "map_types": [
+    "satellite",
+    "roadmap"
+  ],
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/satellite/1170_région_de_bruxelles-capitale_-_brussels_hoofd",
+  "total_images": 4,
+  "download_timestamp": "2026-01-27T22:57:59.908744",
+  "maps_metadata": {
+    "zoom_17_satellite": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.37746933628409324,
+      "tile_coverage_m": 241.58037522181968,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_17_roadmap": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.37746933628409324,
+      "tile_coverage_m": 241.58037522181968,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_18_satellite": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18873466814204662,
+      "tile_coverage_m": 120.79018761090984,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    },
+    "zoom_18_roadmap": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18873466814204662,
+      "tile_coverage_m": 120.79018761090984,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    }
+  }
+}

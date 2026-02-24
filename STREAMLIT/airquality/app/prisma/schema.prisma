@@ -1,0 +1,480 @@
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// MODÈLE: ADRESSES GÉOLOCALISÉES
+// ============================================================
+model Address {
+  id                Int      @id @default(autoincrement())
+  fullAddress       String   @map("full_address")
+  normalizedAddress String   @unique @map("normalized_address")
+  streetNumber      String?  @map("street_number")
+  streetName        String?  @map("street_name")
+  postalCode        String?  @map("postal_code")
+  city              String?
+  country           String   @default("Belgium")
+  latitude          Float
+  longitude         Float
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  airQualityRecords   AirQualityRecord[]
+  weatherRecords      WeatherRecord[]
+  pollenRecords       PollenRecord[]
+  satelliteDownloads  SatelliteDownload[]
+  streetViewDownloads StreetViewDownload[]
+  trafficRecords      TrafficRecord[]
+  greenSpaceMetrics   GreenSpaceMetric[]
+  qevScores           QeVScore[]
+
+  @@index([normalizedAddress])
+  @@index([postalCode])
+  @@index([city])
+  @@map("addresses")
+}
+
+// ============================================================
+// MODÈLE: QUALITÉ DE L'AIR
+// ============================================================
+model AirQualityRecord {
+  id              Int      @id @default(autoincrement())
+  timestamp       DateTime
+  addressId       Int      @map("address_id")
+  stationId       Int?     @map("station_id")
+
+  // Polluants principaux
+  pm10            Float?
+  pm25            Float?   @map("pm2_5")
+  nitrogenDioxide Float?   @map("nitrogen_dioxide")
+  ozone           Float?
+  sulfurDioxide   Float?   @map("sulfur_dioxide")
+  carbonMonoxide  Float?   @map("carbon_monoxide")
+
+  // Indices AQI
+  aqiValue        Int?     @map("aqi_value")
+  aqiCategory     String?  @map("aqi_category")
+
+  // Métadonnées
+  dataSource      String   @default("brussels_opendata") @map("data_source")
+  dataQuality     String?  @map("data_quality")
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  address Address  @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  station Station? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+
+  anomalies DataAnomaly[]
+
+  @@unique([addressId, timestamp, stationId])
+  @@index([addressId])
+  @@index([stationId])
+  @@index([timestamp(sort: Desc)])
+  @@index([aqiCategory])
+  @@index([addressId, timestamp(sort: Desc)])  // Composite index for time-range queries
+  @@index([dataSource])                         // Index for data source filtering
+  @@map("air_quality_records")
+}
+
+// ============================================================
+// MODÈLE: DONNÉES POLLENS (table séparée)
+// ============================================================
+model PollenRecord {
+  id           Int      @id @default(autoincrement())
+  addressId    Int      @map("address_id")
+  timestamp    DateTime
+
+  // Types de pollens (noms botaniques)
+  graminaceae  Float?
+  betula       Float?
+  alnus        Float?
+  corylus      Float?
+  cupressaceae Float?
+  populus      Float?
+  quercus      Float?
+  fraxinus     Float?
+  platanus     Float?
+  urticaceae   Float?
+  artemisia    Float?
+  ambrosia     Float?
+  plantago     Float?
+  poaceae      Float?
+  chenopod     Float?
+  totalPollen  Float?   @map("total_pollen")
+
+  dataSource   String   @default("irceline") @map("data_source")
+  qualityFlag  String?  @map("quality_flag")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+
+  @@unique([addressId, timestamp])
+  @@index([addressId])
+  @@index([timestamp(sort: Desc)])
+  @@map("pollen_records")
+}
+
+// ============================================================
+// MODÈLE: DONNÉES MÉTÉOROLOGIQUES
+// ============================================================
+model WeatherRecord {
+  id                  Int      @id @default(autoincrement())
+  timestamp           DateTime
+  addressId           Int      @map("address_id")
+  stationId           Int?     @map("station_id")
+
+  temperature         Float?
+  feelsLike           Float?   @map("feels_like")
+  humidity            Int?
+  pressure            Float?
+  dewPoint            Float?   @map("dew_point")
+  windSpeed           Float?   @map("wind_speed")
+  windDirection       Int?     @map("wind_direction")
+  windDirectionText   String?  @map("wind_direction_text")
+  windGusts           Float?   @map("wind_gusts")
+  precipitation1h     Float?   @map("precipitation_1h")
+  precipitation24h    Float?   @map("precipitation_24h")
+  cloudCover          Int?     @map("cloud_cover")
+  visibility          Float?
+  sunshine1h          Float?   @map("sunshine_1h")
+  uvIndex             Float?   @map("uv_index")
+  weatherCode         Int?     @map("weather_code")
+  weatherDescription  String?  @map("weather_description")
+
+  dataSource          String   @default("irm") @map("data_source")
+  metadata            Json?
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  address Address  @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  station Station? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+
+  @@unique([addressId, timestamp, stationId])
+  @@index([addressId])
+  @@index([stationId])
+  @@index([timestamp(sort: Desc)])
+  @@index([addressId, timestamp(sort: Desc)])  // Composite index for time-range queries
+  @@map("weather_records")
+}
+
+// ============================================================
+// MODÈLE: STATIONS DE MESURE
+// ============================================================
+model Station {
+  id          Int      @id @default(autoincrement())
+  stationCode String   @unique @map("station_code")
+  stationName String   @map("station_name")
+  stationType String   @map("station_type")
+  latitude    Float
+  longitude   Float
+  elevation   Float?
+  isActive    Boolean  @default(true) @map("is_active")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  airQualityRecords AirQualityRecord[]
+  weatherRecords    WeatherRecord[]
+
+  @@index([stationType])
+  @@index([isActive])
+  @@map("stations")
+}
+
+// ============================================================
+// MODÈLE: ENREGISTREMENTS TRAFIC
+// ============================================================
+model TrafficRecord {
+  id                   Int      @id @default(autoincrement())
+  addressId            Int      @map("address_id")
+  timestamp            DateTime
+
+  lightVehicles        Int?     @map("light_vehicles")
+  utilityVehicles      Int?     @map("utility_vehicles")
+  heavyVehicles        Int?     @map("heavy_vehicles")
+  trafficNuisanceScore Float?   @map("traffic_nuisance_score")
+
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @default(now()) @map("updated_at")
+
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+
+  @@unique([addressId, timestamp])
+  @@index([addressId, timestamp])
+  @@map("traffic_records")
+}
+
+// ============================================================
+// MODÈLE: MÉTRIQUES ESPACES VERTS
+// ============================================================
+model GreenSpaceMetric {
+  id                      Int    @id @default(autoincrement())
+  addressId               Int    @map("address_id")
+
+  treesVisibleCount       Int?   @map("trees_visible_count")
+  hasMinimum3Trees        Boolean? @map("has_minimum_3_trees")
+  canopyCoveragePct       Float? @map("canopy_coverage_pct")
+  distanceToNearestParkM  Float? @map("distance_to_nearest_park_m")
+  greenIndexScore         Float? @map("green_index_score")
+
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @default(now()) @map("updated_at")
+
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+
+  @@index([addressId])
+  @@map("green_space_metrics")
+}
+
+// ============================================================
+// MODÈLE: ESPACES VERTS (géometrie)
+// ============================================================
+model GreenSpace {
+  id             Int    @id @default(autoincrement())
+  greenSpaceType String? @map("green_space_type") @db.VarChar(100)
+  area           Float?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("green_spaces")
+}
+
+// ============================================================
+// MODÈLE: SCORE QeV (Qualité Environnementale de Vie)
+// ============================================================
+model QeVScore {
+  id                     Int      @id @default(autoincrement())
+  addressId              Int      @map("address_id")
+
+  // Sous-indices bruts
+  rawAirIndex            Float?   @map("raw_air_index")
+  rawTrafficNuisance     Float?   @map("raw_traffic_nuisance")
+  rawGreenIndex          Float?   @map("raw_green_index")
+
+  // Scores normalisés (0-1)
+  normalizedAirScore     Float?   @map("normalized_air_score")
+  normalizedTrafficScore Float?   @map("normalized_traffic_score")
+  normalizedGreenScore   Float?   @map("normalized_green_score")
+
+  // Score final
+  qevScore               Float    @map("qev_score")
+  qevCategory            String   @map("qev_category") @db.VarChar(50)
+
+  // Poids
+  weightAir              Float?   @default(0.50) @map("weight_air")
+  weightTraffic          Float?   @default(0.25) @map("weight_traffic")
+  weightGreen            Float?   @default(0.25) @map("weight_green")
+
+  calculatedAt           DateTime? @default(now()) @map("calculated_at")
+  createdAt              DateTime? @default(now()) @map("created_at")
+  updatedAt              DateTime? @default(now()) @map("updated_at")
+
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
+
+  @@index([addressId])
+  @@index([qevCategory])
+  @@map("qev_scores")
+}
+
+// ============================================================
+// MODÈLE: META-SCORES
+// ============================================================
+model MetaScore {
+  id                   Int      @id @default(autoincrement())
+  addressId            Int      @map("address_id")
+  calculatedAt         DateTime @default(now()) @map("calculated_at")
+
+  airQualityScore      Float?   @map("air_quality_score")
+  greenSpaceScore      Float?   @map("green_space_score")
+  urbanDensityScore    Float?   @map("urban_density_score")
+  noiseScore           Float?   @map("noise_score")
+  weatherComfortScore  Float?   @map("weather_comfort_score")
+  overallScore         Float    @map("overall_score")
+  scoreCategory        String   @map("score_category")
+  dataCompleteness     Float?   @map("data_completeness")
+  confidenceLevel      Float?   @map("confidence_level")
+  calculationMetadata  Json?    @map("calculation_metadata")
+
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  @@index([addressId])
+  @@index([calculatedAt(sort: Desc)])
+  @@index([overallScore])
+  @@map("meta_scores")
+}
+
+// ============================================================
+// MODÈLE: ANOMALIES DE DONNÉES
+// ============================================================
+model DataAnomaly {
+  id             Int       @id @default(autoincrement())
+  detectedAt     DateTime  @default(now()) @map("detected_at")
+  recordType     String    @map("record_type")
+  recordId       Int?      @map("record_id")
+  issueType      String    @map("issue_type")
+  pollutant      String?
+  value          Float?
+  threshold      Float?
+  description    String?
+  isCorrected    Boolean   @default(false) @map("is_corrected")
+  correctedAt    DateTime? @map("corrected_at")
+  correctionNote String?   @map("correction_note")
+
+  record AirQualityRecord? @relation(fields: [recordId], references: [id], onDelete: SetNull)
+
+  @@index([detectedAt(sort: Desc)])
+  @@index([recordType])
+  @@index([isCorrected])
+  @@map("data_anomalies")
+}
+
+// ============================================================
+// MODÈLE: TÉLÉCHARGEMENTS SATELLITE
+// ============================================================
+model SatelliteDownload {
+  id              Int      @id @default(autoincrement())
+  addressId       Int      @map("address_id")
+  radiusKm        Float    @map("radius_km")
+  zoomLevels      Int[]    @map("zoom_levels")
+  mapTypes        String[] @map("map_types")
+  outputDirectory String   @map("output_directory")
+  totalImages     Int      @map("total_images")
+  downloadDate    DateTime @default(now()) @map("download_date")
+  metadata        Json?
+
+  address Address           @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  images  SatelliteImage[]
+
+  @@index([addressId])
+  @@index([downloadDate(sort: Desc)])
+  @@map("satellite_downloads")
+}
+
+// ============================================================
+// MODÈLE: IMAGES SATELLITE
+// ============================================================
+model SatelliteImage {
+  id              Int      @id @default(autoincrement())
+  downloadId      Int      @map("download_id")
+  filename        String
+  filepath        String
+  zoomLevel       Int      @map("zoom_level")
+  mapType         String   @map("map_type")
+  imageWidth      Int      @map("image_width")
+  imageHeight     Int      @map("image_height")
+  resolutionMPerPx Float   @map("resolution_m_per_px")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  download SatelliteDownload @relation(fields: [downloadId], references: [id], onDelete: Cascade)
+
+  @@index([downloadId])
+  @@map("satellite_images")
+}
+
+// ============================================================
+// MODÈLE: TÉLÉCHARGEMENTS STREET VIEW
+// ============================================================
+model StreetViewDownload {
+  id                Int      @id @default(autoincrement())
+  addressId         Int      @map("address_id")
+  radiusM           Int      @map("radius_m")
+  totalPhotos       Int      @map("total_photos")
+  qualityFilterUsed Boolean  @map("quality_filter_used")
+  outputDirectory   String   @map("output_directory")
+  downloadDate      DateTime @default(now()) @map("download_date")
+  metadata          Json?
+
+  address Address            @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  images  StreetViewImage[]
+
+  @@index([addressId])
+  @@index([downloadDate(sort: Desc)])
+  @@map("streetview_downloads")
+}
+
+// ============================================================
+// MODÈLE: IMAGES STREET VIEW
+// ============================================================
+model StreetViewImage {
+  id           Int      @id @default(autoincrement())
+  downloadId   Int      @map("download_id")
+  filename     String
+  filepath     String
+  latitude     Float
+  longitude    Float
+  heading      Int
+  qualityScore Int?     @map("quality_score")
+  isOutdoor    Boolean? @map("is_outdoor")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  download StreetViewDownload @relation(fields: [downloadId], references: [id], onDelete: Cascade)
+
+  @@index([downloadId])
+  @@map("streetview_images")
+}
+
+// ============================================================
+// MODÈLE: ANALYSES D'IMAGES (YOLO, Segmentation)
+// ============================================================
+model ImageAnalysis {
+  id             Int      @id @default(autoincrement())
+  imageType      String   @map("image_type")
+  imageId        Int      @map("image_id")
+  analysisType   String   @map("analysis_type")
+  modelName      String   @map("model_name")
+  modelVersion   String?  @map("model_version")
+  results        Json
+  statistics     Json?
+  processingTime Float?   @map("processing_time")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([imageType, imageId])
+  @@index([analysisType])
+  @@index([createdAt(sort: Desc)])
+  @@map("image_analyses")
+}
+
+// ============================================================
+// MODÈLE: UTILISATEURS
+// ============================================================
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  role         String    @default("user")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  lastLogin    DateTime? @map("last_login")
+
+  sessions Session[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// ============================================================
+// MODÈLE: SESSIONS UTILISATEUR (JWT)
+// ============================================================
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  jwtToken     String   @unique @map("jwt_token")
+  createdAt    DateTime @default(now()) @map("created_at")
+  expiresAt    DateTime @map("expires_at")
+  lastActivity DateTime @default(now()) @map("last_activity")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([jwtToken])
+  @@index([expiresAt])
+  @@map("sessions")
+}

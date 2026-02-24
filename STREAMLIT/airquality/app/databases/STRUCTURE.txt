@@ -1,0 +1,117 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                  📦 STRUCTURE DU PROJET REFACTORISÉ                  ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+📁 airquality/app/
+│
+├── 🎯 app.py (357 lignes) ⭐ POINT D'ENTRÉE PRINCIPAL
+│   ├─ Configuration Streamlit
+│   ├─ Fonction main()
+│   │  ├─ Interface utilisateur (sidebar)
+│   │  ├─ Géolocalisation
+│   │  ├─ Téléchargement air quality
+│   │  └─ Appel display_results()
+│   └─ Gestion session state
+│
+├── 🌤️ weather_ui.py (241 lignes) ⭐ MODULE MÉTÉO
+│   ├─ download_weather_data()         → Télécharge 16 jours
+│   ├─ create_temperature_chart()      → Graphique T°
+│   ├─ create_precipitation_wind_chart() → Graphique pluie/vent
+│   └─ display_weather_section()       → Onglet météo complet
+│
+├── 📊 results_ui.py (235 lignes) ⭐ MODULE RÉSULTATS
+│   └─ display_results()
+│      ├─ Métriques clés (AQI, PM2.5)
+│      ├─ Carte interactive
+│      └─ 6 onglets :
+│         ├─ 📈 Évolution temporelle
+│         ├─ 📊 Statistiques
+│         ├─ 🌼 Pollens & UV
+│         ├─ 🌤️ Météo → appelle weather_ui
+│         ├─ 🛰️ Environnement → appelle environment_ui
+│         └─ 🔬 Données brutes
+│
+└── 🛰️ environment_ui.py (247 lignes) ⭐ MODULE ENVIRONNEMENT
+    ├─ display_environment_section()  → Interface principale
+    ├─ display_satellite_gallery()    → Galerie satellites
+    └─ display_streetview_gallery()   → Galerie Street View
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                           🔄 FLUX DE DONNÉES                         ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+   Utilisateur
+       ↓
+   [app.py] ────────────────────────┐
+       ↓                             │
+   Télécharge données                │
+       ↓                             │
+   main() → display_results()        │
+              ↓                      │
+          [results_ui.py]            │
+              ↓                      │
+          6 onglets:                 │
+              ├─ Stats               │
+              ├─ Carte               │
+              ├─ [weather_ui] ←──────┤─ Graphiques météo
+              └─ [environment_ui] ←──┘  Images satellites
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                         📊 STATISTIQUES CLÉS                         ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────┬─────────┬─────────┬──────────────┐
+│ Métrique             │  Avant  │  Après  │ Amélioration │
+├──────────────────────┼─────────┼─────────┼──────────────┤
+│ Lignes app.py        │  1816   │   357   │    -80.3%    │
+│ Nombre de modules    │    1    │    4    │    +300%     │
+│ Code dupliqué        │   3x    │   0x    │    -100%     │
+│ Erreurs de syntaxe   │   2     │   0     │    -100%     │
+│ Imports manquants    │   2     │   0     │    -100%     │
+│ Total lignes projet  │  1816   │  1080   │    -40.5%    │
+└──────────────────────┴─────────┴─────────┴──────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                       ✅ PROBLÈMES CORRIGÉS                          ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+1. ❌ Code dupliqué (3 copies de display_weather_section, etc.)
+   ✅ Une seule version dans les modules appropriés
+
+2. ❌ Erreur syntaxe ligne 398-400 (ax.plot orphelin)
+   ✅ Code corrigé avec vérification if 'feels_like' in df
+
+3. ❌ Import manquant: typing.Dict
+   ✅ Ajouté dans environment_ui.py et results_ui.py
+
+4. ❌ Import manquant: EnvironmentDB, EnvironmentDownloader
+   ✅ Import lazy ajouté dans environment_ui.py
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                        🚀 COMMENT UTILISER                           ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+# Lancer l'application
+streamlit run app.py
+
+# Vérifier la structure
+python3 check_structure.py
+
+# Vérifier les imports
+python3 -c "from weather_ui import *; from results_ui import *"
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║                         📝 DOCUMENTATION                             ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+• REFACTORING.md    → Documentation détaillée des changements
+• check_structure.py → Script de vérification automatique
+• STRUCTURE.txt     → Ce fichier (vue d'ensemble)
+
+
+Réalisé le 22/11/2025 par Claude Code Assistant

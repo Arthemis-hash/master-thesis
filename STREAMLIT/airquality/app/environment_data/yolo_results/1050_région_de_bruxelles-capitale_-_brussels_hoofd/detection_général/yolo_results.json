@@ -1,0 +1,560 @@
+{
+  "metadata": {
+    "date": "2026-01-28T18:32:55.148242",
+    "total_images": 12,
+    "total_detections": 29
+  },
+  "images": [
+    {
+      "image_name": "street_03_20260127_114735_h225.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_03_20260127_114735_h225.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 4,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.8570173382759094,
+          "bbox": {
+            "x1": 434.7917785644531,
+            "y1": 397.4975280761719,
+            "x2": 604.976318359375,
+            "y2": 453.4706115722656
+          },
+          "bbox_area_pixels": 9525.75390625,
+          "coverage_percent": 2.3256235122680664
+        },
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.4461839497089386,
+          "bbox": {
+            "x1": 630.7828369140625,
+            "y1": 381.1927490234375,
+            "x2": 639.7237548828125,
+            "y2": 432.38427734375
+          },
+          "bbox_area_pixels": 457.6992492675781,
+          "coverage_percent": 0.11174298077821733
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.3526257276535034,
+          "bbox": {
+            "x1": 227.48046875,
+            "y1": 391.209716796875,
+            "x2": 254.795166015625,
+            "y2": 424.61474609375
+          },
+          "bbox_area_pixels": 912.4482421875,
+          "coverage_percent": 0.2227656841278076
+        },
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.26550042629241943,
+          "bbox": {
+            "x1": 579.2188720703125,
+            "y1": 383.89251708984375,
+            "x2": 594.7913818359375,
+            "y2": 413.77166748046875
+          },
+          "bbox_area_pixels": 465.2933654785156,
+          "coverage_percent": 0.11359701305627821
+        }
+      ]
+    },
+    {
+      "image_name": "street_01_opp_20260127_114734_h135.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_opp_20260127_114734_h135.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 6,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.8323977589607239,
+          "bbox": {
+            "x1": 96.13766479492188,
+            "y1": 393.5179443359375,
+            "x2": 147.591552734375,
+            "y2": 431.97882080078125
+          },
+          "bbox_area_pixels": 1978.961669921875,
+          "coverage_percent": 0.48314493894577026
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.677857518196106,
+          "bbox": {
+            "x1": 0.042255401611328125,
+            "y1": 396.327392578125,
+            "x2": 54.21096420288086,
+            "y2": 453.48828125
+          },
+          "bbox_area_pixels": 3096.33154296875,
+          "coverage_percent": 0.755940318107605
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.5772207975387573,
+          "bbox": {
+            "x1": 212.66915893554688,
+            "y1": 392.68133544921875,
+            "x2": 256.1297912597656,
+            "y2": 422.48883056640625
+          },
+          "bbox_area_pixels": 1295.45263671875,
+          "coverage_percent": 0.3162726163864136
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.4834633767604828,
+          "bbox": {
+            "x1": 0.12809371948242188,
+            "y1": 403.5625,
+            "x2": 41.47493362426758,
+            "y2": 463.494384765625
+          },
+          "bbox_area_pixels": 2477.994140625,
+          "coverage_percent": 0.6049790382385254
+        },
+        {
+          "class_id": 11,
+          "class_name": "stop sign",
+          "confidence": 0.3156074285507202,
+          "bbox": {
+            "x1": 331.50970458984375,
+            "y1": 352.61480712890625,
+            "x2": 355.31719970703125,
+            "y2": 408.2149658203125
+          },
+          "bbox_area_pixels": 1323.7005615234375,
+          "coverage_percent": 0.323169082403183
+        },
+        {
+          "class_id": 74,
+          "class_name": "clock",
+          "confidence": 0.2776569426059723,
+          "bbox": {
+            "x1": 499.7127685546875,
+            "y1": 0.07166099548339844,
+            "x2": 535.7305908203125,
+            "y2": 19.65420150756836
+          },
+          "bbox_area_pixels": 705.3204345703125,
+          "coverage_percent": 0.1721973717212677
+        }
+      ]
+    },
+    {
+      "image_name": "street_02_20260127_114735_h180.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_02_20260127_114735_h180.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 1,
+      "detections": [
+        {
+          "class_id": 9,
+          "class_name": "traffic light",
+          "confidence": 0.5437842011451721,
+          "bbox": {
+            "x1": 41.18514633178711,
+            "y1": 265.05377197265625,
+            "x2": 51.9870719909668,
+            "y2": 285.841796875
+          },
+          "bbox_area_pixels": 224.5507049560547,
+          "coverage_percent": 0.05482194945216178
+        }
+      ]
+    },
+    {
+      "image_name": "street_04_20260127_114735_h360.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_04_20260127_114735_h360.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 5,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.789864718914032,
+          "bbox": {
+            "x1": 582.8629150390625,
+            "y1": 372.5821533203125,
+            "x2": 609.6224365234375,
+            "y2": 391.0533447265625
+          },
+          "bbox_area_pixels": 494.2802429199219,
+          "coverage_percent": 0.12067388743162155
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.6443468332290649,
+          "bbox": {
+            "x1": 607.1141357421875,
+            "y1": 368.64984130859375,
+            "x2": 624.2757568359375,
+            "y2": 379.10430908203125
+          },
+          "bbox_area_pixels": 179.41561889648438,
+          "coverage_percent": 0.043802641332149506
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.46737566590309143,
+          "bbox": {
+            "x1": 569.878173828125,
+            "y1": 368.6614685058594,
+            "x2": 585.152587890625,
+            "y2": 377.1609802246094
+          },
+          "bbox_area_pixels": 129.82505798339844,
+          "coverage_percent": 0.031695570796728134
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.42831161618232727,
+          "bbox": {
+            "x1": 568.89306640625,
+            "y1": 367.63323974609375,
+            "x2": 581.369873046875,
+            "y2": 375.83636474609375
+          },
+          "bbox_area_pixels": 102.34880065917969,
+          "coverage_percent": 0.02498750016093254
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.38661009073257446,
+          "bbox": {
+            "x1": 533.2449951171875,
+            "y1": 364.98431396484375,
+            "x2": 550.1405029296875,
+            "y2": 375.59698486328125
+          },
+          "bbox_area_pixels": 179.30645751953125,
+          "coverage_percent": 0.04377599060535431
+        }
+      ]
+    },
+    {
+      "image_name": "street_01_20260127_114734_h315.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_20260127_114734_h315.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 6,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.8818005323410034,
+          "bbox": {
+            "x1": 24.370391845703125,
+            "y1": 395.01220703125,
+            "x2": 159.53897094726562,
+            "y2": 508.6990966796875
+          },
+          "bbox_area_pixels": 15366.8955078125,
+          "coverage_percent": 3.751683473587036
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.8578370213508606,
+          "bbox": {
+            "x1": 136.39120483398438,
+            "y1": 381.8133239746094,
+            "x2": 186.24398803710938,
+            "y2": 430.2720031738281
+          },
+          "bbox_area_pixels": 2415.800048828125,
+          "coverage_percent": 0.589794933795929
+        },
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.47628074884414673,
+          "bbox": {
+            "x1": 218.90638732910156,
+            "y1": 370.0618896484375,
+            "x2": 230.12754821777344,
+            "y2": 405.0185546875
+          },
+          "bbox_area_pixels": 392.2543640136719,
+          "coverage_percent": 0.09576522558927536
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.44455885887145996,
+          "bbox": {
+            "x1": 160.61428833007812,
+            "y1": 377.6610107421875,
+            "x2": 194.11181640625,
+            "y2": 403.8675537109375
+          },
+          "bbox_area_pixels": 877.8544311523438,
+          "coverage_percent": 0.2143199294805527
+        },
+        {
+          "class_id": 2,
+          "class_name": "car",
+          "confidence": 0.4292251467704773,
+          "bbox": {
+            "x1": 94.51976013183594,
+            "y1": 380.3291931152344,
+            "x2": 139.3419189453125,
+            "y2": 400.4456481933594
+          },
+          "bbox_area_pixels": 901.6629638671875,
+          "coverage_percent": 0.22013255953788757
+        },
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.4182087182998657,
+          "bbox": {
+            "x1": 630.16259765625,
+            "y1": 365.93206787109375,
+            "x2": 639.746826171875,
+            "y2": 403.04327392578125
+          },
+          "bbox_area_pixels": 355.6822814941406,
+          "coverage_percent": 0.08683649450540543
+        }
+      ]
+    },
+    {
+      "image_name": "street_05_20260127_114736_h270.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_05_20260127_114736_h270.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 0,
+      "detections": []
+    },
+    {
+      "image_name": "street_03_20260127_114735_h225.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_03_20260127_114735_h225.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 0,
+      "detections": []
+    },
+    {
+      "image_name": "street_01_opp_20260127_114734_h135.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_opp_20260127_114734_h135.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 1,
+      "detections": [
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.9086824059486389,
+          "bbox": {
+            "x1": 18.90789794921875,
+            "y1": 413.3004150390625,
+            "x2": 631.2571411132812,
+            "y2": 640.0
+          },
+          "bbox_area_pixels": 138819.3125,
+          "coverage_percent": 33.89143371582031
+        }
+      ]
+    },
+    {
+      "image_name": "street_02_20260127_114735_h180.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_02_20260127_114735_h180.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 2,
+      "detections": [
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.9746326804161072,
+          "bbox": {
+            "x1": 112.1885986328125,
+            "y1": 0.0,
+            "x2": 638.5120849609375,
+            "y2": 640.0
+          },
+          "bbox_area_pixels": 336847.03125,
+          "coverage_percent": 82.23804473876953
+        },
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.25455981492996216,
+          "bbox": {
+            "x1": 0.0,
+            "y1": 135.0858917236328,
+            "x2": 238.4874267578125,
+            "y2": 640.0
+          },
+          "bbox_area_pixels": 120415.671875,
+          "coverage_percent": 29.398357391357422
+        }
+      ]
+    },
+    {
+      "image_name": "street_04_20260127_114735_h360.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_04_20260127_114735_h360.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 1,
+      "detections": [
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.8932250738143921,
+          "bbox": {
+            "x1": 0.0,
+            "y1": 5.55328369140625,
+            "x2": 635.0513305664062,
+            "y2": 640.0
+          },
+          "bbox_area_pixels": 402906.21875,
+          "coverage_percent": 98.36577606201172
+        }
+      ]
+    },
+    {
+      "image_name": "street_01_20260127_114734_h315.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_20260127_114734_h315.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 2,
+      "detections": [
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.8002685904502869,
+          "bbox": {
+            "x1": 0.3984375,
+            "y1": 159.7406005859375,
+            "x2": 264.477783203125,
+            "y2": 512.9635620117188
+          },
+          "bbox_area_pixels": 93278.890625,
+          "coverage_percent": 22.77316665649414
+        },
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.4859544038772583,
+          "bbox": {
+            "x1": 0.0,
+            "y1": 169.78709411621094,
+            "x2": 259.9029541015625,
+            "y2": 640.0
+          },
+          "bbox_area_pixels": 122209.71875,
+          "coverage_percent": 29.83635711669922
+        }
+      ]
+    },
+    {
+      "image_name": "street_05_20260127_114736_h270.jpg",
+      "image_path": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1050_région_de_bruxelles-capitale_-_brussels_hoofd/street_05_20260127_114736_h270.jpg",
+      "image_dimensions": {
+        "width": 640,
+        "height": 640,
+        "total_pixels": 409600
+      },
+      "detection_count": 1,
+      "detections": [
+        {
+          "class_id": 0,
+          "class_name": "tree",
+          "confidence": 0.3126640319824219,
+          "bbox": {
+            "x1": 3.2833251953125,
+            "y1": 0.0,
+            "x2": 588.2266845703125,
+            "y2": 634.04345703125
+          },
+          "bbox_area_pixels": 370879.5,
+          "coverage_percent": 90.5467529296875
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "car": {
+      "total_count": 15,
+      "total_surface_pixels": 39934.33126831055,
+      "average_per_image": 1.25,
+      "average_surface_pixels": 2662.288751220703
+    },
+    "tree": {
+      "total_count": 11,
+      "total_surface_pixels": 1587027.273010254,
+      "average_per_image": 0.9166666666666666,
+      "average_surface_pixels": 144275.2066372958
+    },
+    "stop sign": {
+      "total_count": 1,
+      "total_surface_pixels": 1323.7005615234375,
+      "average_per_image": 0.08333333333333333,
+      "average_surface_pixels": 1323.7005615234375
+    },
+    "clock": {
+      "total_count": 1,
+      "total_surface_pixels": 705.3204345703125,
+      "average_per_image": 0.08333333333333333,
+      "average_surface_pixels": 705.3204345703125
+    },
+    "traffic light": {
+      "total_count": 1,
+      "total_surface_pixels": 224.5507049560547,
+      "average_per_image": 0.08333333333333333,
+      "average_surface_pixels": 224.5507049560547
+    }
+  }
+}

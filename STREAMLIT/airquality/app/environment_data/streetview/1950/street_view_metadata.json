@@ -1,0 +1,24 @@
+{
+  "address": "10, Avenue des Trembles, Kraainem, Hal-Vilvorde, Brabant flamand, Flandre, 1950, Belgique",
+  "latitude": 50.834135,
+  "longitude": 4.4813464,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 11,
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950",
+  "download_timestamp": "2026-01-09T22:10:28.347284",
+  "downloaded_files": [
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_01_20260109_221025_h315.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_01_opp_20260109_221025_h135.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_02_20260109_221026_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_03_20260109_221026_h180.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_04_20260109_221026_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_05_20260109_221026_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_06_20260109_221027_h0.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_07_20260109_221027_h45.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_08_20260109_221027_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_09_20260109_221027_h135.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1950/street_10_20260109_221028_h0.jpg"
+  ]
+}

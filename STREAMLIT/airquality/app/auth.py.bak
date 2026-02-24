@@ -1,0 +1,510 @@
+#!/usr/bin/env python3
+"""
+Module d'authentification Streamlit - Système JWT avec DB
+"""
+
+import streamlit as st
+from datetime import datetime, timedelta
+import logging
+from typing import Optional
+import time
+
+from auth_manager import AuthManager
+
+logger = logging.getLogger(__name__)
+
+# === CSS (identique) ===
+def inject_login_styles():
+    """Injecte styles CSS - Isolation complète"""
+    st.markdown("""
+        <style>
+        /* Masquage TOTAL de tous les éléments Streamlit */
+        [data-testid="stSidebar"],
+        [data-testid="stSidebarNav"],
+        [data-testid="stHeader"],
+        [data-testid="stDecoration"],
+        [data-testid="stToolbar"],
+        [data-testid="stStatusWidget"],
+        #MainMenu, footer, header,
+        .stDeployButton,
+        [data-testid="stAppViewContainer"] > div:first-child {
+            display: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            opacity: 0 !important;
+        }
+        
+        /* Reset TOTAL du container */
+        .main, 
+        .block-container, 
+        [data-testid="stVerticalBlock"],
+        [data-testid="stAppViewContainer"],
+        section[data-testid="stMain"] {
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        
+        .stApp {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+        }
+        
+        .block-container {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 100vh !important;
+        }
+        
+        /* Container encore plus compact */
+        .login-container {
+            background: white;
+            padding: 1.2rem 1rem;
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            width: 90%;
+            max-width: 260px !important;
+            margin: 0 auto;
+        }
+        
+        .login-logo {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .login-title {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.8rem;
+        }
+        
+        /* Force inputs compacts même avec styles app */
+        .stTextInput,
+        div[data-testid="stTextInput"] {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .stTextInput > label {
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 0.2rem !important;
+            color: #4a5568 !important;
+        }
+        
+        .stTextInput input,
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 7px !important;
+            padding: 0.45rem 0.6rem !important;
+            font-size: 0.8rem !important;
+            height: 36px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        .stTextInput input:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+        }
+        
+        .stTextInput {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Bouton compact */
+        .stButton,
+        div[data-testid="stButton"] {
+            width: 100% !important;
+        }
+        
+        .stButton button {
+            width: 100% !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            border-radius: 7px !important;
+            padding: 0.5rem !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            height: 38px !important;
+            margin-top: 0.3rem !important;
+        }
+        
+        .stButton button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Form container */
+        [data-testid="stForm"] {
+            width: 100% !important;
+            border: none !important;
+            padding: 0 !important;
+        }
+        
+        /* Divider compact */
+        hr {
+            margin: 0.7rem 0 !important;
+            border-color: #e2e8f0 !important;
+        }
+        
+        /* Info box compte test */
+        .test-account-box {
+            margin-top: 0.8rem;
+            padding: 0.6rem;
+            background: #f7fafc;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .test-account-box small {
+            font-size: 0.7rem !important;
+            color: #4a5568;
+        }
+        
+        .test-account-box code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #2d3748;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+
+def init_session():
+    """Initialise session state"""
+    defaults = {
+        'authenticated': False,
+        'user_data': None,
+        'jwt_token': None,
+        'last_refresh': None,
+        'show_create_user': False,
+        'cleanup_done': False
+    }
+    for key, val in defaults.items():
+        st.session_state.setdefault(key, val)
+
+
+def check_token_refresh():
+    """Rafraîchit token si nécessaire (30min)"""
+    if not st.session_state.authenticated or not st.session_state.jwt_token:
+        return
+    
+    last_refresh = st.session_state.get('last_refresh')
+    if not last_refresh:
+        st.session_state.last_refresh = datetime.now()
+        return
+    
+    # Rafraîchir si > 25 minutes (marge sécurité)
+    if datetime.now() - last_refresh > timedelta(minutes=25):
+        auth = AuthManager()
+        result = auth.refresh_token(st.session_state.jwt_token)
+        
+        if result:
+            new_token, expires_at = result
+            st.session_state.jwt_token = new_token
+            st.session_state.last_refresh = datetime.now()
+            logger.info("🔄 Token auto-rafraîchi")
+        else:
+            # Token invalide, forcer déconnexion
+            logout()
+            st.warning("⏰ Session expirée, reconnectez-vous")
+            st.rerun()
+
+
+def logout():
+    """Déconnexion avec nettoyage complet"""
+    if st.session_state.jwt_token:
+        auth = AuthManager()
+        auth.logout(st.session_state.jwt_token)
+    
+    # Nettoyage TOTAL du session_state
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    
+    logger.info("🚪 Déconnexion + nettoyage session_state")
+    
+    # Force rerun complet
+    st.rerun()
+
+
+def login_page():
+    """Page login simplifiée - sans option d'inscription"""
+    inject_login_styles()
+    auth = AuthManager()
+    
+    st.markdown('<div class="login-container">', unsafe_allow_html=True)
+    st.markdown('<div class="login-logo">🌍</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-title">Air Quality Application</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-subtitle">Veuillez vous connecter pour accéder à l\'application</div>', unsafe_allow_html=True)
+
+    # === LOGIN ===
+    with st.form("login_form"):
+        email = st.text_input("📧 Email", placeholder="email@exemple.com")
+        password = st.text_input("🔑 Mot de passe", type="password")
+        submit = st.form_submit_button("🚀 Connexion")
+    
+    if submit:
+        if not email or not password:
+            st.error("⚠️ Champs requis")
+        else:
+            success, user_data = auth.login(email, password)
+            
+            if success:
+                st.session_state.authenticated = True
+                st.session_state.user_data = user_data
+                st.session_state.jwt_token = user_data['token']
+                st.session_state.last_refresh = datetime.now()
+                
+                st.success(f"✅ Bienvenue")
+                st.balloons()
+                time.sleep(0.5)
+                st.rerun()
+            else:
+                st.error("❌ Identifiants incorrects")
+    
+    # Compte test avec nouvelle classe CSS
+    st.markdown("""
+        <div class="test-account-box">
+            <small>🔐 Test: <code>test@test.com</code> / <code>test</code></small>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.divider()
+    
+    # Information création de compte
+    st.markdown("""
+        <div style="text-align: center; 
+                    padding: 0.6rem;
+                    background: #f7fafc;
+                    border-radius: 8px;
+                    border: 1px solid #e2e8f0;">
+            <small style="font-size: 0.7rem; color: #4a5568;">
+                ℹ️ Nouveau compte ? Contactez un administrateur
+            </small>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+def show_admin_panel():
+    """Panel admin pour gérer les utilisateurs"""
+    st.markdown("""
+        <div style="text-align: center; 
+                    padding: 0.8rem 0; 
+                    border-bottom: 2px solid #e2e8f0;
+                    margin-bottom: 1rem;">
+            <h3 style="margin: 0; 
+                       color: #dc2626; 
+                       font-size: 0.95rem;
+                       font-weight: 700;
+                       letter-spacing: 0.5px;">
+                🛡️ ADMIN PANEL
+            </h3>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Bouton pour ouvrir le dialogue de création
+    if st.button("➕ Créer un utilisateur", use_container_width=True, type="primary"):
+        st.session_state.show_create_user = True
+    
+    # Dialogue de création d'utilisateur
+    if st.session_state.get('show_create_user', False):
+        st.markdown("""
+            <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); 
+                        padding: 1rem; 
+                        border-radius: 10px; 
+                        border: 2px solid #0ea5e9;
+                        margin: 1rem 0;">
+        """, unsafe_allow_html=True)
+        
+        st.markdown("**➕ Nouveau compte**")
+        
+        with st.form("create_user_form", clear_on_submit=True):
+            col1, col2 = st.columns(2)
+            with col1:
+                new_first_name = st.text_input("� Prénom", placeholder="Jean", key="admin_new_first_name")
+            with col2:
+                new_last_name = st.text_input("� Nom", placeholder="Dupont", key="admin_new_last_name")
+            
+            new_email = st.text_input("📧 Email", placeholder="jean.dupont@exemple.com", key="admin_new_email")
+            new_role = st.selectbox("�️ Rôle", ["user", "admin"], key="admin_new_role")
+            
+            st.info("🔐 Un mot de passe sécurisé sera généré automatiquement et envoyé par email")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                submit = st.form_submit_button("✅ Créer & Envoyer", use_container_width=True, type="primary")
+            with col2:
+                cancel = st.form_submit_button("❌ Annuler", use_container_width=True)
+        
+        if submit:
+            if not new_email or not new_first_name or not new_last_name:
+                st.error("⚠️ Tous les champs sont requis")
+            else:
+                auth = AuthManager()
+                
+                with st.spinner("Création du compte et envoi de l'email..."):
+                    success, error, password = auth.register(
+                        new_email, 
+                        new_first_name, 
+                        new_last_name, 
+                        role=new_role,
+                        send_email=True
+                    )
+                
+                if success:
+                    st.success(f"✅ Compte créé pour {new_first_name} {new_last_name}")
+                    st.info(f"📧 Email envoyé à {new_email}")
+                    
+                    # Afficher le mot de passe généré (au cas où l'email échoue)
+                    with st.expander("🔑 Mot de passe généré (à communiquer si l'email n'arrive pas)"):
+                        st.code(password, language=None)
+                        st.caption("⚠️ Conservez ce mot de passe en lieu sûr jusqu'à confirmation de réception de l'email")
+                    
+                    st.session_state.show_create_user = False
+                    time.sleep(2)
+                    st.rerun()
+                else:
+                    st.error(f"❌ {error}")
+        
+        if cancel:
+            st.session_state.show_create_user = False
+            st.rerun()
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    st.divider()
+
+
+def show_user_sidebar():
+    """Sidebar utilisateur optimisée pour le dashboard"""
+    with st.sidebar:
+        # Titre sidebar
+        st.markdown("""
+            <div style="text-align: center; 
+                        padding: 0.8rem 0; 
+                        border-bottom: 2px solid #e2e8f0;
+                        margin-bottom: 1rem;">
+                <h3 style="margin: 0; 
+                           color: #2d3748; 
+                           font-size: 1rem;
+                           font-weight: 700;
+                           letter-spacing: 0.5px;">
+                    👤 PROFIL USER
+                </h3>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        user = st.session_state.user_data
+        role = user.get('role', 'user')
+        
+        role_config = {
+            'admin': {'color': '#dc2626', 'bg': 'linear-gradient(135deg, #fee2e2, #fecaca)'},
+            'user': {'color': '#059669', 'bg': 'linear-gradient(135deg, #d1fae5, #a7f3d0)'}
+        }
+        config = role_config.get(role, role_config['user'])
+        
+        # Card utilisateur compact
+        full_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+        display_name = full_name if full_name else user['email']
+        
+        st.markdown(f"""
+            <div style="background: {config['bg']}; 
+                        padding: 1rem; 
+                        border-radius: 10px; 
+                        border-left: 4px solid {config['color']};
+                        margin-bottom: 1rem;">
+                <div style="margin-bottom: 0.6rem;">
+                    <div style="font-size: 0.9rem; 
+                                font-weight: 700; 
+                                color: #1a202c;
+                                margin-bottom: 0.3rem;">
+                        {display_name}
+                    </div>
+                    <div style="font-size: 0.75rem; 
+                                color: #4a5568;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;">
+                        {user['email']}
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <span style="display: inline-block;
+                                background: {config['color']}; 
+                                color: white;
+                                padding: 0.2rem 0.8rem; 
+                                border-radius: 12px;
+                                font-size: 0.7rem;
+                                font-weight: 700;
+                                letter-spacing: 0.5px;">
+                        {role.upper()}
+                    </span>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Bouton déconnexion
+        if st.button("🚪 Déconnexion", use_container_width=True, type="secondary"):
+            logout()
+            st.rerun()
+        
+        st.divider()
+        
+        # Section Admin - Gestion des utilisateurs
+        if is_admin():
+            show_admin_panel()
+
+
+def require_auth():
+    """Protection authentification"""
+    init_session()
+    
+    # Nettoyage automatique au démarrage de l'app
+    if 'cleanup_done' not in st.session_state:
+        auth = AuthManager()
+        auth._cleanup_sessions()
+        st.session_state.cleanup_done = True
+    
+    # Vérifier token
+    if st.session_state.authenticated and st.session_state.jwt_token:
+        auth = AuthManager()
+        valid, user_data = auth.verify_session(st.session_state.jwt_token)
+        
+        if not valid:
+            logout()
+            st.warning("⏰ Session expirée")
+            st.stop()
+        
+        # Rafraîchir si nécessaire
+        check_token_refresh()
+    
+    if not st.session_state.authenticated:
+        login_page()
+        st.stop()
+    
+    show_user_sidebar()
+
+
+def get_current_user() -> dict:
+    """Retourne user connecté"""
+    return st.session_state.user_data if st.session_state.authenticated else {}
+
+
+def is_admin() -> bool:
+    """Vérifie si admin"""
+    user = get_current_user()
+    return user.get('role') == 'admin'

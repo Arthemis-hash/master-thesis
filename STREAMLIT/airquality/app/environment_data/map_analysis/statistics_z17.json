@@ -1,0 +1,53 @@
+{
+  "zoom_level": 17,
+  "pixel_to_meter": 0.6,
+  "image_dimensions": {
+    "width": 3200,
+    "height": 3200,
+    "total_pixels": 10240000
+  },
+  "total_area_m2": 3686400.0,
+  "elements": {
+    "roads": {
+      "coverage_percent": 15.681767578125,
+      "pixel_count": 1605813,
+      "total_pixels": 10240000,
+      "area_m2": 578092.6799999999,
+      "perimeter_pixels": 69074,
+      "num_regions": 39,
+      "avg_region_size": 41174.692307692305
+    },
+    "green_spaces": {
+      "coverage_percent": 0.0,
+      "pixel_count": 0,
+      "total_pixels": 10240000,
+      "area_m2": 0.0,
+      "perimeter_pixels": 0,
+      "num_regions": 0,
+      "avg_region_size": 0
+    },
+    "water": {
+      "coverage_percent": 0.0,
+      "pixel_count": 0,
+      "total_pixels": 10240000,
+      "area_m2": 0.0,
+      "perimeter_pixels": 0,
+      "num_regions": 0,
+      "avg_region_size": 0
+    },
+    "buildings": {
+      "coverage_percent": 84.15387695312499,
+      "pixel_count": 8617357,
+      "total_pixels": 10240000,
+      "area_m2": 3102248.52,
+      "perimeter_pixels": 122052,
+      "num_regions": 68,
+      "avg_region_size": 126725.83823529411
+    }
+  },
+  "ratios": {
+    "built_vs_natural": Infinity,
+    "green_ratio": 0.0,
+    "impervious_surface": 99.83564453125
+  }
+}

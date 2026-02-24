@@ -1,0 +1,18 @@
+{
+  "address": "Tête olmèque No.8, Chaussée de La Hulpe, Coin du Balai, Boitsfort, Watermael-Boitsfort, Bruxelles-Capitale, 1170, Belgique",
+  "latitude": 50.7947106,
+  "longitude": 4.410281,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 5,
+  "output_directory": "environment_data/streetview/1050_1050_région_de_bruxelles-capitale_-_brussels_",
+  "download_timestamp": "2025-11-22T19:44:05.055353",
+  "downloaded_files": [
+    "environment_data/streetview/1050_1050_région_de_bruxelles-capitale_-_brussels_/street_01_20251122_194402_h180.jpg",
+    "environment_data/streetview/1050_1050_région_de_bruxelles-capitale_-_brussels_/street_01_opp_20251122_194403_h0.jpg",
+    "environment_data/streetview/1050_1050_région_de_bruxelles-capitale_-_brussels_/street_02_20251122_194403_h315.jpg",
+    "environment_data/streetview/1050_1050_région_de_bruxelles-capitale_-_brussels_/street_03_20251122_194404_h90.jpg",
+    "environment_data/streetview/1050_1050_région_de_bruxelles-capitale_-_brussels_/street_04_20251122_194405_h90.jpg"
+  ]
+}

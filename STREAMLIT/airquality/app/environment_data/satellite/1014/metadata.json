@@ -1,0 +1,59 @@
+{
+  "address": "Westergas, 4, Haarlemmerweg, West, Amsterdam, Noord-Holland, Nederland, 1014 BE, Nederland",
+  "latitude": 52.3867106,
+  "longitude": 4.8752955,
+  "radius_km": 0.5,
+  "zoom_levels": [
+    17,
+    18
+  ],
+  "map_types": [
+    "satellite",
+    "roadmap"
+  ],
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/satellite/1014",
+  "total_images": 4,
+  "download_timestamp": "2026-01-08T15:31:58.131062",
+  "maps_metadata": {
+    "zoom_17_satellite": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.36446662868346186,
+      "tile_coverage_m": 233.2586423574156,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_17_roadmap": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.36446662868346186,
+      "tile_coverage_m": 233.2586423574156,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_18_satellite": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18223331434173093,
+      "tile_coverage_m": 116.6293211787078,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    },
+    "zoom_18_roadmap": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.18223331434173093,
+      "tile_coverage_m": 116.6293211787078,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    }
+  }
+}

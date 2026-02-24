@@ -1,0 +1,25 @@
+{
+  "address": "Grand-Place, Quartier du Centre, Pentagone, Bruxelles, Bruxelles-Capitale, 1000, Belgique",
+  "latitude": 50.8467139,
+  "longitude": 4.3525151,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 12,
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd",
+  "download_timestamp": "2026-01-22T15:41:43.689014",
+  "downloaded_files": [
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_20260122_154138_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_02_20260122_154138_h180.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_03_20260122_154139_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_04_20260122_154139_h315.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_05_20260122_154140_h45.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_06_20260122_154140_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_07_20260122_154141_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_08_20260122_154141_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_09_20260122_154142_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_10_20260122_154142_h315.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_11_20260122_154143_h0.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1000_région_de_bruxelles-capitale_-_brussels_hoofd/street_12_20260122_154143_h90.jpg"
+  ]
+}

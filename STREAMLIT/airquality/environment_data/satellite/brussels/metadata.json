@@ -1,0 +1,27 @@
+{
+  "address": "Rue de la Loi 100, Brussels",
+  "latitude": 50.8442333,
+  "longitude": 4.375933,
+  "radius_km": 0.3,
+  "zoom_levels": [
+    17
+  ],
+  "map_types": [
+    "satellite"
+  ],
+  "output_directory": "environment_data/satellite/brussels",
+  "total_images": 1,
+  "download_timestamp": "2025-11-23T19:28:48.407437",
+  "maps_metadata": {
+    "zoom_17_satellite": {
+      "grid_size": 3,
+      "resolution_m_per_px": 0.3770679476655845,
+      "tile_coverage_m": 241.32348650597407,
+      "total_tiles": 9,
+      "image_size": [
+        1920,
+        1920
+      ]
+    }
+  }
+}

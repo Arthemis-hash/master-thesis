@@ -1,0 +1,23 @@
+{
+  "address": "Westergas, 4, Haarlemmerweg, West, Amsterdam, Hollande-Septentrionale, Pays-Bas, 1014 BE, Pays-Bas",
+  "latitude": 52.386145,
+  "longitude": 4.8753523,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 10,
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014",
+  "download_timestamp": "2026-01-08T15:32:31.340796",
+  "downloaded_files": [
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_01_20260108_153228_h0.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_02_20260108_153229_h360.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_03_20260108_153229_h45.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_04_20260108_153229_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_05_20260108_153229_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_06_20260108_153230_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_07_20260108_153230_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_08_20260108_153230_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_09_20260108_153231_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1014/street_10_20260108_153231_h270.jpg"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "address": "Hôtel communal de Woluwe-Saint-Pierre, Rue Paul Lancsweert, Woluwe-Saint-Pierre Centre, Woluwe-Saint-Pierre, Bruxelles-Capitale, 1150, Belgique",
+  "latitude": 50.8372636,
+  "longitude": 4.4270517,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 11,
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd",
+  "download_timestamp": "2025-11-23T20:22:34.656837",
+  "downloaded_files": [
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_20251123_202231_h180.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_opp_20251123_202231_h0.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_02_20251123_202231_h360.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_02_opp_20251123_202232_h180.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_03_20251123_202232_h45.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_03_opp_20251123_202232_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_04_20251123_202233_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_04_opp_20251123_202233_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_05_20251123_202233_h90.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_05_opp_20251123_202234_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1150_région_de_bruxelles-capitale_-_brussels_hoofd/street_06_20251123_202234_h45.jpg"
+  ]
+}

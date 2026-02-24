@@ -1,0 +1,59 @@
+{
+  "address": "131, Brusselsestraat, Sint-Martens-Lennik, Lennik, Halle-Vilvoorde, Vlaams-Brabant, Vlaanderen, 1750, België / Belgique / Belgien",
+  "latitude": 50.81138019999999,
+  "longitude": 4.1912482,
+  "radius_km": 0.5,
+  "zoom_levels": [
+    17,
+    18
+  ],
+  "map_types": [
+    "satellite",
+    "roadmap"
+  ],
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/satellite/1750_brusselsestraat",
+  "total_images": 4,
+  "download_timestamp": "2026-01-09T22:25:03.178186",
+  "maps_metadata": {
+    "zoom_17_satellite": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.3773334020798724,
+      "tile_coverage_m": 241.49337733111835,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_17_roadmap": {
+      "grid_size": 5,
+      "resolution_m_per_px": 0.3773334020798724,
+      "tile_coverage_m": 241.49337733111835,
+      "total_tiles": 25,
+      "image_size": [
+        3200,
+        3200
+      ]
+    },
+    "zoom_18_satellite": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.1886667010399362,
+      "tile_coverage_m": 120.74668866555918,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    },
+    "zoom_18_roadmap": {
+      "grid_size": 9,
+      "resolution_m_per_px": 0.1886667010399362,
+      "tile_coverage_m": 120.74668866555918,
+      "total_tiles": 81,
+      "image_size": [
+        5760,
+        5760
+      ]
+    }
+  }
+}

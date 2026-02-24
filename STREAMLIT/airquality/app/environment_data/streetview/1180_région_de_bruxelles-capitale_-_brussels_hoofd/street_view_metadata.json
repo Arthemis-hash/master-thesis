@@ -1,0 +1,20 @@
+{
+  "address": "835, Chaussée d'Alsemberg, Globe, Uccle, Bruxelles-Capitale, 1180, Belgique",
+  "latitude": 50.8012655,
+  "longitude": 4.3362981,
+  "radius_m": 250,
+  "max_photos": 12,
+  "quality_filter_used": true,
+  "total_photos": 7,
+  "output_directory": "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd",
+  "download_timestamp": "2026-01-12T01:04:46.070787",
+  "downloaded_files": [
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd/street_01_20260112_010443_h315.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd/street_02_20260112_010443_h135.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd/street_03_20260112_010444_h225.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd/street_04_20260112_010444_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd/street_05_20260112_010445_h270.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd/street_06_20260112_010445_h360.jpg",
+    "/Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/app/environment_data/streetview/1180_région_de_bruxelles-capitale_-_brussels_hoofd/street_07_20260112_010446_h45.jpg"
+  ]
+}
