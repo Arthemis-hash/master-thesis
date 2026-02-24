@@ -1,0 +1,29 @@
+# API qualité de l'air IRCELINE
+open-irceline>=0.2.0
+
+# API météo (pas de package externe nécessaire, utilise requests)
+requests>=2.31.0
+
+# Analyse de données
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualisation
+plotly>=5.14.0
+matplotlib>=3.7.0
+
+# Interface web
+streamlit>=1.28.0
+
+# Base de données
+sqlite3  # inclus dans Python
+
+# Géocodage
+geopy>=2.3.0
+
+# Configuration
+python-dotenv>=1.0.0
+toml>=0.10.2
+
+# Optionnel: Asynchrone
+aiohttp>=3.9.0

@@ -1,0 +1,1866 @@
+#!/usr/bin/env python3
+"""
+Module de comparaison avancée multi-adresses
+"""
+
+import pandas as pd
+import streamlit as st
+from typing import Dict, List, Optional
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import folium
+from streamlit_folium import st_folium
+import io
+
+from db_utils import BrusselsAirQualityDB, WeatherDB
+
+
+class AddressComparator:
+    """Comparaison intelligente entre adresses"""
+    
+    def __init__(self, addresses: List[str], addresses_coords: Optional[Dict] = None):
+        self.addresses = addresses
+        self.addresses_coords = addresses_coords or {}
+        self.air_dbs = {addr: BrusselsAirQualityDB(addr, force_new=False) for addr in addresses}
+        self.weather_dbs = {addr: WeatherDB(addr, force_new=False) for addr in addresses}
+    
+    def create_comparison_map(self) -> folium.Map:
+        """Crée une carte avec toutes les adresses comparées"""
+        if not self.addresses_coords:
+            return None
+        
+        lats = [coords['lat'] for coords in self.addresses_coords.values()]
+        lons = [coords['lon'] for coords in self.addresses_coords.values()]
+        center_lat, center_lon = sum(lats) / len(lats), sum(lons) / len(lons)
+        
+        m = folium.Map(location=[center_lat, center_lon], zoom_start=12, tiles="OpenStreetMap")
+        colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige']
+        
+        for idx, (addr, coords) in enumerate(self.addresses_coords.items()):
+            summary = self.air_dbs[addr].get_summary()
+            pm25 = summary.get('avg_pm2_5', 0) if summary else 0
+            pm10 = summary.get('avg_pm10', 0) if summary else 0
+            
+            popup_html = f"""<div style="font-family: Arial; width: 200px;">
+                <h4 style="color: {colors[idx % len(colors)]};">📍 Adresse {idx + 1}</h4>
+                <p><b>{addr[:40]}...</b></p><hr>
+                <p><b>Qualité Air:</b></p>
+                <p>PM2.5: {pm25:.1f} µg/m³</p>
+                <p>PM10: {pm10:.1f} µg/m³</p></div>"""
+            
+            folium.Marker(
+                [coords['lat'], coords['lon']],
+                popup=folium.Popup(popup_html, max_width=250),
+                tooltip=f"Adresse {idx + 1}",
+                icon=folium.Icon(color=colors[idx % len(colors)], icon='home', prefix='fa')
+            ).add_to(m)
+        
+        return m
+    
+    def export_to_excel(self) -> io.BytesIO:
+        """Exporter toutes les données de comparaison vers Excel"""
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df_air = self.compare_air_quality()
+            if not df_air.empty:
+                df_air.to_excel(writer, sheet_name='Qualité Air', index=False)
+            df_weather = self.compare_weather()
+            if not df_weather.empty:
+                df_weather.to_excel(writer, sheet_name='Météo', index=False)
+        output.seek(0)
+        return output
+    
+    def compare_air_quality(self) -> pd.DataFrame:
+        """
+        Comparaison qualité air entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5 (µg/m³)': round(summary.get('avg_pm2_5', 0), 1),
+                    'PM10 (µg/m³)': round(summary.get('avg_pm10', 0), 1),
+                    'NO₂ (µg/m³)': round(summary.get('avg_no2', 0), 1),
+                    'O₃ (µg/m³)': round(summary.get('avg_o3', 0), 1),
+                    'Records': summary['total_records'],
+                    'Stations': summary['num_stations']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def compare_weather(self) -> pd.DataFrame:
+        """
+        Comparaison météo entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                # Fonction helper pour arrondir seulement si non-None
+                def safe_round(value, decimals=1):
+                    return round(value, decimals) if value is not None else 0.0
+                
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'Temp. moy (°C)': safe_round(summary.get('avg_temp')),
+                    'Temp. min (°C)': safe_round(summary.get('min_temp')),
+                    'Temp. max (°C)': safe_round(summary.get('max_temp')),
+                    'Vent moy (km/h)': safe_round(summary.get('avg_wind')),
+                    'Humidité (%)': safe_round(summary.get('avg_humidity')),
+                    'Records': summary['total_records']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def plot_pollutant_comparison(self, pollutant: str) -> go.Figure:
+        """
+        Graphique comparatif évolution temporelle d'un polluant
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.air_dbs[addr].get_pollutant_data(pollutant)
+            
+            if not df.empty:
+                # Agréger par jour pour lisibilité
+                df_daily = df.set_index('timestamp').resample('D')['value'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['value'],
+                    mode='lines+markers',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2),
+                    marker=dict(size=4)
+                ))
+        
+        fig.update_layout(
+            title=f"Comparaison {pollutant.upper()} - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Concentration (µg/m³)",
+            hovermode='x unified',
+            template='plotly_white',
+            legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02)
+        )
+        
+        return fig
+    
+    def plot_radar_comparison(self) -> go.Figure:
+        """
+        Radar chart normalisé multi-adresses
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if not summary or summary.get('total_records', 0) == 0:
+                continue
+            
+            # Normalisation 0-100 (100 = meilleur)
+            scores = {
+                'PM2.5': max(0, 100 - (summary.get('avg_pm2_5', 0) / 75 * 100)),
+                'PM10': max(0, 100 - (summary.get('avg_pm10', 0) / 150 * 100)),
+                'NO₂': max(0, 100 - (summary.get('avg_no2', 0) / 340 * 100)),
+                'O₃': max(0, 100 - (summary.get('avg_o3', 0) / 380 * 100))
+            }
+            
+            fig.add_trace(go.Scatterpolar(
+                r=list(scores.values()),
+                theta=list(scores.keys()),
+                fill='toself',
+                name=addr[:20] + '...' if len(addr) > 20 else addr
+            ))
+        
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 100],
+                    ticksuffix='',
+                    tickmode='linear',
+                    tick0=0,
+                    dtick=20
+                )
+            ),
+            showlegend=True,
+            title="Score qualité air normalisé (100 = excellent)"
+        )
+        
+        return fig
+    
+    def plot_temperature_comparison(self) -> go.Figure:
+        """
+        Graphique comparatif température
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.weather_dbs[addr].get_all_data(limit=500)
+            
+            if not df.empty:
+                # Agréger par jour
+                df_daily = df.set_index('timestamp').resample('D')['temperature'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['temperature'],
+                    mode='lines',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2)
+                ))
+        
+        fig.update_layout(
+            title="Comparaison température - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Température (°C)",
+            hovermode='x unified',
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def get_ranking(self) -> Dict[str, List[tuple]]:
+        """
+        Classement adresses par critère
+        Retourne dict {critère: [(adresse, valeur), ...]}
+        """
+        rankings = {
+            'PM2.5': [],
+            'PM10': [],
+            'NO₂': [],
+            'O₃': [],
+            'Température': []
+        }
+        
+        # Qualité air
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['PM2.5'].append((addr, summary.get('avg_pm2_5', float('inf'))))
+                rankings['PM10'].append((addr, summary.get('avg_pm10', float('inf'))))
+                rankings['NO₂'].append((addr, summary.get('avg_no2', float('inf'))))
+                rankings['O₃'].append((addr, summary.get('avg_o3', float('inf'))))
+        
+        # Météo
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['Température'].append((addr, summary.get('avg_temp', 0)))
+        
+        # Trier (du meilleur au pire)
+        for key in ['PM2.5', 'PM10', 'NO₂']:
+            rankings[key].sort(key=lambda x: x[1])  # Croissant = meilleur
+        
+        rankings['O₃'].sort(key=lambda x: abs(x[1] - 100))  # Proche de 100 = meilleur
+        rankings['Température'].sort(key=lambda x: abs(x[1] - 20))  # Proche de 20°C
+        
+        return rankings
+    
+    def create_comparison_map(self) -> folium.Map:
+        """
+        Crée une carte avec toutes les adresses comparées
+        """
+        if not self.addresses_coords:
+            return None
+        
+        # Calculer le centre de la carte (moyenne des coordonnées)
+        lats = [coords['lat'] for coords in self.addresses_coords.values()]
+        lons = [coords['lon'] for coords in self.addresses_coords.values()]
+        
+        center_lat = sum(lats) / len(lats)
+        center_lon = sum(lons) / len(lons)
+        
+        # Créer la carte
+        m = folium.Map(
+            location=[center_lat, center_lon],
+            zoom_start=12,
+            tiles="OpenStreetMap"
+        )
+        
+        # Ajouter les marqueurs pour chaque adresse avec des couleurs différentes
+        colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige', 'darkblue', 'darkgreen']
+        
+        for idx, (addr, coords) in enumerate(self.addresses_coords.items()):
+            color = colors[idx % len(colors)]
+            
+            # Récupérer le score de qualité air
+            summary = self.air_dbs[addr].get_summary()
+            pm25 = summary.get('avg_pm2_5', 0) if summary else 0
+            pm10 = summary.get('avg_pm10', 0) if summary else 0
+            
+            # Déterminer l'icône selon la qualité
+            if pm25 < 12 and pm10 < 20:
+                icon = 'smile'
+            elif pm25 < 35 and pm10 < 50:
+                icon = 'meh'
+            else:
+                icon = 'frown'
+            
+            popup_html = f"""
+            <div style="font-family: Arial; width: 200px;">
+                <h4 style="color: {color};">📍 Adresse {idx + 1}</h4>
+                <p><b>{addr[:40]}...</b></p>
+                <hr>
+                <p><b>Qualité Air:</b></p>
+                <p>PM2.5: {pm25:.1f} µg/m³</p>
+                <p>PM10: {pm10:.1f} µg/m³</p>
+            </div>
+            """
+            
+            folium.Marker(
+                [coords['lat'], coords['lon']],
+                popup=folium.Popup(popup_html, max_width=250),
+                tooltip=f"Adresse {idx + 1}",
+                icon=folium.Icon(color=color, icon=icon, prefix='fa')
+            ).add_to(m)
+        
+        return m
+    
+    def get_comparative_stats(self) -> pd.DataFrame:
+        """
+        Statistiques comparatives détaillées avec écarts
+        """
+        stats = []
+        
+        for addr in self.addresses:
+            air_summary = self.air_dbs[addr].get_summary()
+            weather_summary = self.weather_dbs[addr].get_summary()
+            
+            if air_summary and air_summary.get('total_records', 0) > 0:
+                stats.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5': air_summary.get('avg_pm2_5', 0),
+                    'PM10': air_summary.get('avg_pm10', 0),
+                    'NO₂': air_summary.get('avg_no2', 0),
+                    'O₃': air_summary.get('avg_o3', 0),
+                    'Temp': weather_summary.get('avg_temp', 0) if weather_summary else 0,
+                    'Records Air': air_summary['total_records'],
+                    'Records Météo': weather_summary.get('total_records', 0) if weather_summary else 0
+                })
+        
+        if not stats:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(stats)
+        
+        # Calculer les écarts par rapport à la meilleure adresse
+        for col in ['PM2.5', 'PM10', 'NO₂', 'O₃']:
+            if col in df.columns:
+                best_val = df[col].min()
+                df[f'Écart {col} (%)'] = ((df[col] - best_val) / best_val * 100).round(1)
+        
+        return df
+    
+    def export_to_excel(self) -> io.BytesIO:
+        """
+        Exporter toutes les données de comparaison vers Excel
+        """
+        output = io.BytesIO()
+        
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            # Onglet 1: Résumé qualité air
+            df_air = self.compare_air_quality()
+            if not df_air.empty:
+                df_air.to_excel(writer, sheet_name='Qualité Air', index=False)
+            
+            # Onglet 2: Résumé météo
+            df_weather = self.compare_weather()
+            if not df_weather.empty:
+                df_weather.to_excel(writer, sheet_name='Météo', index=False)
+            
+            # Onglet 3: Statistiques comparatives
+            df_stats = self.get_comparative_stats()
+            if not df_stats.empty:
+                df_stats.to_excel(writer, sheet_name='Statistiques', index=False)
+            
+            # Onglet 4: Classement
+            rankings = self.get_ranking()
+            ranking_data = []
+            for criterion, values in rankings.items():
+                for rank, (addr, val) in enumerate(values, 1):
+                    ranking_data.append({
+                        'Critère': criterion,
+                        'Rang': rank,
+                        'Adresse': addr,
+                        'Valeur': round(val, 2)
+                    })
+            
+            if ranking_data:
+                df_ranking = pd.DataFrame(ranking_data)
+                df_ranking.to_excel(writer, sheet_name='Classements', index=False)
+        
+        output.seek(0)
+        return output
+    
+    def compare_air_quality(self) -> pd.DataFrame:
+        """
+        Comparaison qualité air entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5 (µg/m³)': round(summary.get('avg_pm2_5', 0), 1),
+                    'PM10 (µg/m³)': round(summary.get('avg_pm10', 0), 1),
+                    'NO₂ (µg/m³)': round(summary.get('avg_no2', 0), 1),
+                    'O₃ (µg/m³)': round(summary.get('avg_o3', 0), 1),
+                    'Records': summary['total_records'],
+                    'Stations': summary['num_stations']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def compare_weather(self) -> pd.DataFrame:
+        """
+        Comparaison météo entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                # Fonction helper pour arrondir seulement si non-None
+                def safe_round(value, decimals=1):
+                    return round(value, decimals) if value is not None else 0.0
+                
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'Temp. moy (°C)': safe_round(summary.get('avg_temp')),
+                    'Temp. min (°C)': safe_round(summary.get('min_temp')),
+                    'Temp. max (°C)': safe_round(summary.get('max_temp')),
+                    'Vent moy (km/h)': safe_round(summary.get('avg_wind')),
+                    'Humidité (%)': safe_round(summary.get('avg_humidity')),
+                    'Records': summary['total_records']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def plot_pollutant_comparison(self, pollutant: str) -> go.Figure:
+        """
+        Graphique comparatif évolution temporelle d'un polluant
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.air_dbs[addr].get_pollutant_data(pollutant)
+            
+            if not df.empty:
+                # Agréger par jour pour lisibilité
+                df_daily = df.set_index('timestamp').resample('D')['value'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['value'],
+                    mode='lines+markers',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2),
+                    marker=dict(size=4)
+                ))
+        
+        fig.update_layout(
+            title=f"Comparaison {pollutant.upper()} - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Concentration (µg/m³)",
+            hovermode='x unified',
+            template='plotly_white',
+            legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02)
+        )
+        
+        return fig
+    
+    def plot_radar_comparison(self) -> go.Figure:
+        """
+        Radar chart normalisé multi-adresses
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if not summary or summary.get('total_records', 0) == 0:
+                continue
+            
+            # Normalisation 0-100 (100 = meilleur)
+            scores = {
+                'PM2.5': max(0, 100 - (summary.get('avg_pm2_5', 0) / 75 * 100)),
+                'PM10': max(0, 100 - (summary.get('avg_pm10', 0) / 150 * 100)),
+                'NO₂': max(0, 100 - (summary.get('avg_no2', 0) / 340 * 100)),
+                'O₃': max(0, 100 - (summary.get('avg_o3', 0) / 380 * 100))
+            }
+            
+            fig.add_trace(go.Scatterpolar(
+                r=list(scores.values()),
+                theta=list(scores.keys()),
+                fill='toself',
+                name=addr[:20] + '...' if len(addr) > 20 else addr
+            ))
+        
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 100],
+                    ticksuffix='',
+                    tickmode='linear',
+                    tick0=0,
+                    dtick=20
+                )
+            ),
+            showlegend=True,
+            title="Score qualité air normalisé (100 = excellent)"
+        )
+        
+        return fig
+    
+    def plot_temperature_comparison(self) -> go.Figure:
+        """
+        Graphique comparatif température
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.weather_dbs[addr].get_all_data(limit=500)
+            
+            if not df.empty:
+                # Agréger par jour
+                df_daily = df.set_index('timestamp').resample('D')['temperature'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['temperature'],
+                    mode='lines',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2)
+                ))
+        
+        fig.update_layout(
+            title="Comparaison température - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Température (°C)",
+            hovermode='x unified',
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def get_ranking(self) -> Dict[str, List[tuple]]:
+        """
+        Classement adresses par critère
+        Retourne dict {critère: [(adresse, valeur), ...]}
+        """
+        rankings = {
+            'PM2.5': [],
+            'PM10': [],
+            'NO₂': [],
+            'O₃': [],
+            'Température': []
+        }
+        
+        # Qualité air
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['PM2.5'].append((addr, summary.get('avg_pm2_5', float('inf'))))
+                rankings['PM10'].append((addr, summary.get('avg_pm10', float('inf'))))
+                rankings['NO₂'].append((addr, summary.get('avg_no2', float('inf'))))
+                rankings['O₃'].append((addr, summary.get('avg_o3', float('inf'))))
+        
+        # Météo
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['Température'].append((addr, summary.get('avg_temp', 0)))
+        
+        # Trier (du meilleur au pire)
+        for key in ['PM2.5', 'PM10', 'NO₂']:
+            rankings[key].sort(key=lambda x: x[1])  # Croissant = meilleur
+        
+        rankings['O₃'].sort(key=lambda x: abs(x[1] - 100))  # Proche de 100 = meilleur
+        rankings['Température'].sort(key=lambda x: abs(x[1] - 20))  # Proche de 20°C
+        
+        return rankings
+    
+    def create_comparison_map(self) -> folium.Map:
+        """
+        Crée une carte avec toutes les adresses comparées
+        """
+        if not self.addresses_coords:
+            return None
+        
+        # Calculer le centre de la carte (moyenne des coordonnées)
+        lats = [coords['lat'] for coords in self.addresses_coords.values()]
+        lons = [coords['lon'] for coords in self.addresses_coords.values()]
+        
+        center_lat = sum(lats) / len(lats)
+        center_lon = sum(lons) / len(lons)
+        
+        # Créer la carte
+        m = folium.Map(
+            location=[center_lat, center_lon],
+            zoom_start=12,
+            tiles="OpenStreetMap"
+        )
+        
+        # Ajouter les marqueurs pour chaque adresse avec des couleurs différentes
+        colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige', 'darkblue', 'darkgreen']
+        
+        for idx, (addr, coords) in enumerate(self.addresses_coords.items()):
+            color = colors[idx % len(colors)]
+            
+            # Récupérer le score de qualité air
+            summary = self.air_dbs[addr].get_summary()
+            pm25 = summary.get('avg_pm2_5', 0) if summary else 0
+            pm10 = summary.get('avg_pm10', 0) if summary else 0
+            
+            # Déterminer l'icône selon la qualité
+            if pm25 < 12 and pm10 < 20:
+                icon = 'smile'
+            elif pm25 < 35 and pm10 < 50:
+                icon = 'meh'
+            else:
+                icon = 'frown'
+            
+            popup_html = f"""
+            <div style="font-family: Arial; width: 200px;">
+                <h4 style="color: {color};">📍 Adresse {idx + 1}</h4>
+                <p><b>{addr[:40]}...</b></p>
+                <hr>
+                <p><b>Qualité Air:</b></p>
+                <p>PM2.5: {pm25:.1f} µg/m³</p>
+                <p>PM10: {pm10:.1f} µg/m³</p>
+            </div>
+            """
+            
+            folium.Marker(
+                [coords['lat'], coords['lon']],
+                popup=folium.Popup(popup_html, max_width=250),
+                tooltip=f"Adresse {idx + 1}",
+                icon=folium.Icon(color=color, icon=icon, prefix='fa')
+            ).add_to(m)
+        
+        return m
+    
+    def get_comparative_stats(self) -> pd.DataFrame:
+        """
+        Statistiques comparatives détaillées avec écarts
+        """
+        stats = []
+        
+        for addr in self.addresses:
+            air_summary = self.air_dbs[addr].get_summary()
+            weather_summary = self.weather_dbs[addr].get_summary()
+            
+            if air_summary and air_summary.get('total_records', 0) > 0:
+                stats.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5': air_summary.get('avg_pm2_5', 0),
+                    'PM10': air_summary.get('avg_pm10', 0),
+                    'NO₂': air_summary.get('avg_no2', 0),
+                    'O₃': air_summary.get('avg_o3', 0),
+                    'Temp': weather_summary.get('avg_temp', 0) if weather_summary else 0,
+                    'Records Air': air_summary['total_records'],
+                    'Records Météo': weather_summary.get('total_records', 0) if weather_summary else 0
+                })
+        
+        if not stats:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(stats)
+        
+        # Calculer les écarts par rapport à la meilleure adresse
+        for col in ['PM2.5', 'PM10', 'NO₂', 'O₃']:
+            if col in df.columns:
+                best_val = df[col].min()
+                df[f'Écart {col} (%)'] = ((df[col] - best_val) / best_val * 100).round(1)
+        
+        return df
+    
+    def export_to_excel(self) -> io.BytesIO:
+        """
+        Exporter toutes les données de comparaison vers Excel
+        """
+        output = io.BytesIO()
+        
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            # Onglet 1: Résumé qualité air
+            df_air = self.compare_air_quality()
+            if not df_air.empty:
+                df_air.to_excel(writer, sheet_name='Qualité Air', index=False)
+            
+            # Onglet 2: Résumé météo
+            df_weather = self.compare_weather()
+            if not df_weather.empty:
+                df_weather.to_excel(writer, sheet_name='Météo', index=False)
+            
+            # Onglet 3: Statistiques comparatives
+            df_stats = self.get_comparative_stats()
+            if not df_stats.empty:
+                df_stats.to_excel(writer, sheet_name='Statistiques', index=False)
+            
+            # Onglet 4: Classement
+            rankings = self.get_ranking()
+            ranking_data = []
+            for criterion, values in rankings.items():
+                for rank, (addr, val) in enumerate(values, 1):
+                    ranking_data.append({
+                        'Critère': criterion,
+                        'Rang': rank,
+                        'Adresse': addr,
+                        'Valeur': round(val, 2)
+                    })
+            
+            if ranking_data:
+                df_ranking = pd.DataFrame(ranking_data)
+                df_ranking.to_excel(writer, sheet_name='Classements', index=False)
+        
+        output.seek(0)
+        return output
+    
+    def compare_air_quality(self) -> pd.DataFrame:
+        """
+        Comparaison qualité air entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5 (µg/m³)': round(summary.get('avg_pm2_5', 0), 1),
+                    'PM10 (µg/m³)': round(summary.get('avg_pm10', 0), 1),
+                    'NO₂ (µg/m³)': round(summary.get('avg_no2', 0), 1),
+                    'O₃ (µg/m³)': round(summary.get('avg_o3', 0), 1),
+                    'Records': summary['total_records'],
+                    'Stations': summary['num_stations']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def compare_weather(self) -> pd.DataFrame:
+        """
+        Comparaison météo entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                # Fonction helper pour arrondir seulement si non-None
+                def safe_round(value, decimals=1):
+                    return round(value, decimals) if value is not None else 0.0
+                
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'Temp. moy (°C)': safe_round(summary.get('avg_temp')),
+                    'Temp. min (°C)': safe_round(summary.get('min_temp')),
+                    'Temp. max (°C)': safe_round(summary.get('max_temp')),
+                    'Vent moy (km/h)': safe_round(summary.get('avg_wind')),
+                    'Humidité (%)': safe_round(summary.get('avg_humidity')),
+                    'Records': summary['total_records']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def plot_pollutant_comparison(self, pollutant: str) -> go.Figure:
+        """
+        Graphique comparatif évolution temporelle d'un polluant
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.air_dbs[addr].get_pollutant_data(pollutant)
+            
+            if not df.empty:
+                # Agréger par jour pour lisibilité
+                df_daily = df.set_index('timestamp').resample('D')['value'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['value'],
+                    mode='lines+markers',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2),
+                    marker=dict(size=4)
+                ))
+        
+        fig.update_layout(
+            title=f"Comparaison {pollutant.upper()} - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Concentration (µg/m³)",
+            hovermode='x unified',
+            template='plotly_white',
+            legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02)
+        )
+        
+        return fig
+    
+    def plot_radar_comparison(self) -> go.Figure:
+        """
+        Radar chart normalisé multi-adresses
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if not summary or summary.get('total_records', 0) == 0:
+                continue
+            
+            # Normalisation 0-100 (100 = meilleur)
+            scores = {
+                'PM2.5': max(0, 100 - (summary.get('avg_pm2_5', 0) / 75 * 100)),
+                'PM10': max(0, 100 - (summary.get('avg_pm10', 0) / 150 * 100)),
+                'NO₂': max(0, 100 - (summary.get('avg_no2', 0) / 340 * 100)),
+                'O₃': max(0, 100 - (summary.get('avg_o3', 0) / 380 * 100))
+            }
+            
+            fig.add_trace(go.Scatterpolar(
+                r=list(scores.values()),
+                theta=list(scores.keys()),
+                fill='toself',
+                name=addr[:20] + '...' if len(addr) > 20 else addr
+            ))
+        
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 100],
+                    ticksuffix='',
+                    tickmode='linear',
+                    tick0=0,
+                    dtick=20
+                )
+            ),
+            showlegend=True,
+            title="Score qualité air normalisé (100 = excellent)"
+        )
+        
+        return fig
+    
+    def plot_temperature_comparison(self) -> go.Figure:
+        """
+        Graphique comparatif température
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.weather_dbs[addr].get_all_data(limit=500)
+            
+            if not df.empty:
+                # Agréger par jour
+                df_daily = df.set_index('timestamp').resample('D')['temperature'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['temperature'],
+                    mode='lines',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2)
+                ))
+        
+        fig.update_layout(
+            title="Comparaison température - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Température (°C)",
+            hovermode='x unified',
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def get_ranking(self) -> Dict[str, List[tuple]]:
+        """
+        Classement adresses par critère
+        Retourne dict {critère: [(adresse, valeur), ...]}
+        """
+        rankings = {
+            'PM2.5': [],
+            'PM10': [],
+            'NO₂': [],
+            'O₃': [],
+            'Température': []
+        }
+        
+        # Qualité air
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['PM2.5'].append((addr, summary.get('avg_pm2_5', float('inf'))))
+                rankings['PM10'].append((addr, summary.get('avg_pm10', float('inf'))))
+                rankings['NO₂'].append((addr, summary.get('avg_no2', float('inf'))))
+                rankings['O₃'].append((addr, summary.get('avg_o3', float('inf'))))
+        
+        # Météo
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['Température'].append((addr, summary.get('avg_temp', 0)))
+        
+        # Trier (du meilleur au pire)
+        for key in ['PM2.5', 'PM10', 'NO₂']:
+            rankings[key].sort(key=lambda x: x[1])  # Croissant = meilleur
+        
+        rankings['O₃'].sort(key=lambda x: abs(x[1] - 100))  # Proche de 100 = meilleur
+        rankings['Température'].sort(key=lambda x: abs(x[1] - 20))  # Proche de 20°C
+        
+        return rankings
+    
+    def create_comparison_map(self) -> folium.Map:
+        """
+        Crée une carte avec toutes les adresses comparées
+        """
+        if not self.addresses_coords:
+            return None
+        
+        # Calculer le centre de la carte (moyenne des coordonnées)
+        lats = [coords['lat'] for coords in self.addresses_coords.values()]
+        lons = [coords['lon'] for coords in self.addresses_coords.values()]
+        
+        center_lat = sum(lats) / len(lats)
+        center_lon = sum(lons) / len(lons)
+        
+        # Créer la carte
+        m = folium.Map(
+            location=[center_lat, center_lon],
+            zoom_start=12,
+            tiles="OpenStreetMap"
+        )
+        
+        # Ajouter les marqueurs pour chaque adresse avec des couleurs différentes
+        colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige', 'darkblue', 'darkgreen']
+        
+        for idx, (addr, coords) in enumerate(self.addresses_coords.items()):
+            color = colors[idx % len(colors)]
+            
+            # Récupérer le score de qualité air
+            summary = self.air_dbs[addr].get_summary()
+            pm25 = summary.get('avg_pm2_5', 0) if summary else 0
+            pm10 = summary.get('avg_pm10', 0) if summary else 0
+            
+            # Déterminer l'icône selon la qualité
+            if pm25 < 12 and pm10 < 20:
+                icon = 'smile'
+            elif pm25 < 35 and pm10 < 50:
+                icon = 'meh'
+            else:
+                icon = 'frown'
+            
+            popup_html = f"""
+            <div style="font-family: Arial; width: 200px;">
+                <h4 style="color: {color};">📍 Adresse {idx + 1}</h4>
+                <p><b>{addr[:40]}...</b></p>
+                <hr>
+                <p><b>Qualité Air:</b></p>
+                <p>PM2.5: {pm25:.1f} µg/m³</p>
+                <p>PM10: {pm10:.1f} µg/m³</p>
+            </div>
+            """
+            
+            folium.Marker(
+                [coords['lat'], coords['lon']],
+                popup=folium.Popup(popup_html, max_width=250),
+                tooltip=f"Adresse {idx + 1}",
+                icon=folium.Icon(color=color, icon=icon, prefix='fa')
+            ).add_to(m)
+        
+        return m
+    
+    def get_comparative_stats(self) -> pd.DataFrame:
+        """
+        Statistiques comparatives détaillées avec écarts
+        """
+        stats = []
+        
+        for addr in self.addresses:
+            air_summary = self.air_dbs[addr].get_summary()
+            weather_summary = self.weather_dbs[addr].get_summary()
+            
+            if air_summary and air_summary.get('total_records', 0) > 0:
+                stats.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5': air_summary.get('avg_pm2_5', 0),
+                    'PM10': air_summary.get('avg_pm10', 0),
+                    'NO₂': air_summary.get('avg_no2', 0),
+                    'O₃': air_summary.get('avg_o3', 0),
+                    'Temp': weather_summary.get('avg_temp', 0) if weather_summary else 0,
+                    'Records Air': air_summary['total_records'],
+                    'Records Météo': weather_summary.get('total_records', 0) if weather_summary else 0
+                })
+        
+        if not stats:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(stats)
+        
+        # Calculer les écarts par rapport à la meilleure adresse
+        for col in ['PM2.5', 'PM10', 'NO₂', 'O₃']:
+            if col in df.columns:
+                best_val = df[col].min()
+                df[f'Écart {col} (%)'] = ((df[col] - best_val) / best_val * 100).round(1)
+        
+        return df
+    
+    def export_to_excel(self) -> io.BytesIO:
+        """
+        Exporter toutes les données de comparaison vers Excel
+        """
+        output = io.BytesIO()
+        
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            # Onglet 1: Résumé qualité air
+            df_air = self.compare_air_quality()
+            if not df_air.empty:
+                df_air.to_excel(writer, sheet_name='Qualité Air', index=False)
+            
+            # Onglet 2: Résumé météo
+            df_weather = self.compare_weather()
+            if not df_weather.empty:
+                df_weather.to_excel(writer, sheet_name='Météo', index=False)
+            
+            # Onglet 3: Statistiques comparatives
+            df_stats = self.get_comparative_stats()
+            if not df_stats.empty:
+                df_stats.to_excel(writer, sheet_name='Statistiques', index=False)
+            
+            # Onglet 4: Classement
+            rankings = self.get_ranking()
+            ranking_data = []
+            for criterion, values in rankings.items():
+                for rank, (addr, val) in enumerate(values, 1):
+                    ranking_data.append({
+                        'Critère': criterion,
+                        'Rang': rank,
+                        'Adresse': addr,
+                        'Valeur': round(val, 2)
+                    })
+            
+            if ranking_data:
+                df_ranking = pd.DataFrame(ranking_data)
+                df_ranking.to_excel(writer, sheet_name='Classements', index=False)
+        
+        output.seek(0)
+        return output
+    
+    def compare_air_quality(self) -> pd.DataFrame:
+        """
+        Comparaison qualité air entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5 (µg/m³)': round(summary.get('avg_pm2_5', 0), 1),
+                    'PM10 (µg/m³)': round(summary.get('avg_pm10', 0), 1),
+                    'NO₂ (µg/m³)': round(summary.get('avg_no2', 0), 1),
+                    'O₃ (µg/m³)': round(summary.get('avg_o3', 0), 1),
+                    'Records': summary['total_records'],
+                    'Stations': summary['num_stations']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def compare_weather(self) -> pd.DataFrame:
+        """
+        Comparaison météo entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                # Fonction helper pour arrondir seulement si non-None
+                def safe_round(value, decimals=1):
+                    return round(value, decimals) if value is not None else 0.0
+                
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'Temp. moy (°C)': safe_round(summary.get('avg_temp')),
+                    'Temp. min (°C)': safe_round(summary.get('min_temp')),
+                    'Temp. max (°C)': safe_round(summary.get('max_temp')),
+                    'Vent moy (km/h)': safe_round(summary.get('avg_wind')),
+                    'Humidité (%)': safe_round(summary.get('avg_humidity')),
+                    'Records': summary['total_records']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def plot_pollutant_comparison(self, pollutant: str) -> go.Figure:
+        """
+        Graphique comparatif évolution temporelle d'un polluant
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.air_dbs[addr].get_pollutant_data(pollutant)
+            
+            if not df.empty:
+                # Agréger par jour pour lisibilité
+                df_daily = df.set_index('timestamp').resample('D')['value'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['value'],
+                    mode='lines+markers',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2),
+                    marker=dict(size=4)
+                ))
+        
+        fig.update_layout(
+            title=f"Comparaison {pollutant.upper()} - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Concentration (µg/m³)",
+            hovermode='x unified',
+            template='plotly_white',
+            legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02)
+        )
+        
+        return fig
+    
+    def plot_radar_comparison(self) -> go.Figure:
+        """
+        Radar chart normalisé multi-adresses
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if not summary or summary.get('total_records', 0) == 0:
+                continue
+            
+            # Normalisation 0-100 (100 = meilleur)
+            scores = {
+                'PM2.5': max(0, 100 - (summary.get('avg_pm2_5', 0) / 75 * 100)),
+                'PM10': max(0, 100 - (summary.get('avg_pm10', 0) / 150 * 100)),
+                'NO₂': max(0, 100 - (summary.get('avg_no2', 0) / 340 * 100)),
+                'O₃': max(0, 100 - (summary.get('avg_o3', 0) / 380 * 100))
+            }
+            
+            fig.add_trace(go.Scatterpolar(
+                r=list(scores.values()),
+                theta=list(scores.keys()),
+                fill='toself',
+                name=addr[:20] + '...' if len(addr) > 20 else addr
+            ))
+        
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 100],
+                    ticksuffix='',
+                    tickmode='linear',
+                    tick0=0,
+                    dtick=20
+                )
+            ),
+            showlegend=True,
+            title="Score qualité air normalisé (100 = excellent)"
+        )
+        
+        return fig
+    
+    def plot_temperature_comparison(self) -> go.Figure:
+        """
+        Graphique comparatif température
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.weather_dbs[addr].get_all_data(limit=500)
+            
+            if not df.empty:
+                # Agréger par jour
+                df_daily = df.set_index('timestamp').resample('D')['temperature'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['temperature'],
+                    mode='lines',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2)
+                ))
+        
+        fig.update_layout(
+            title="Comparaison température - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Température (°C)",
+            hovermode='x unified',
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def get_ranking(self) -> Dict[str, List[tuple]]:
+        """
+        Classement adresses par critère
+        Retourne dict {critère: [(adresse, valeur), ...]}
+        """
+        rankings = {
+            'PM2.5': [],
+            'PM10': [],
+            'NO₂': [],
+            'O₃': [],
+            'Température': []
+        }
+        
+        # Qualité air
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['PM2.5'].append((addr, summary.get('avg_pm2_5', float('inf'))))
+                rankings['PM10'].append((addr, summary.get('avg_pm10', float('inf'))))
+                rankings['NO₂'].append((addr, summary.get('avg_no2', float('inf'))))
+                rankings['O₃'].append((addr, summary.get('avg_o3', float('inf'))))
+        
+        # Météo
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['Température'].append((addr, summary.get('avg_temp', 0)))
+        
+        # Trier (du meilleur au pire)
+        for key in ['PM2.5', 'PM10', 'NO₂']:
+            rankings[key].sort(key=lambda x: x[1])  # Croissant = meilleur
+        
+        rankings['O₃'].sort(key=lambda x: abs(x[1] - 100))  # Proche de 100 = meilleur
+        rankings['Température'].sort(key=lambda x: abs(x[1] - 20))  # Proche de 20°C
+        
+        return rankings
+    
+    def create_comparison_map(self) -> folium.Map:
+        """
+        Crée une carte avec toutes les adresses comparées
+        """
+        if not self.addresses_coords:
+            return None
+        
+        # Calculer le centre de la carte (moyenne des coordonnées)
+        lats = [coords['lat'] for coords in self.addresses_coords.values()]
+        lons = [coords['lon'] for coords in self.addresses_coords.values()]
+        
+        center_lat = sum(lats) / len(lats)
+        center_lon = sum(lons) / len(lons)
+        
+        # Créer la carte
+        m = folium.Map(
+            location=[center_lat, center_lon],
+            zoom_start=12,
+            tiles="OpenStreetMap"
+        )
+        
+        # Ajouter les marqueurs pour chaque adresse avec des couleurs différentes
+        colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige', 'darkblue', 'darkgreen']
+        
+        for idx, (addr, coords) in enumerate(self.addresses_coords.items()):
+            color = colors[idx % len(colors)]
+            
+            # Récupérer le score de qualité air
+            summary = self.air_dbs[addr].get_summary()
+            pm25 = summary.get('avg_pm2_5', 0) if summary else 0
+            pm10 = summary.get('avg_pm10', 0) if summary else 0
+            
+            # Déterminer l'icône selon la qualité
+            if pm25 < 12 and pm10 < 20:
+                icon = 'smile'
+            elif pm25 < 35 and pm10 < 50:
+                icon = 'meh'
+            else:
+                icon = 'frown'
+            
+            popup_html = f"""
+            <div style="font-family: Arial; width: 200px;">
+                <h4 style="color: {color};">📍 Adresse {idx + 1}</h4>
+                <p><b>{addr[:40]}...</b></p>
+                <hr>
+                <p><b>Qualité Air:</b></p>
+                <p>PM2.5: {pm25:.1f} µg/m³</p>
+                <p>PM10: {pm10:.1f} µg/m³</p>
+            </div>
+            """
+            
+            folium.Marker(
+                [coords['lat'], coords['lon']],
+                popup=folium.Popup(popup_html, max_width=250),
+                tooltip=f"Adresse {idx + 1}",
+                icon=folium.Icon(color=color, icon=icon, prefix='fa')
+            ).add_to(m)
+        
+        return m
+    
+    def get_comparative_stats(self) -> pd.DataFrame:
+        """
+        Statistiques comparatives détaillées avec écarts
+        """
+        stats = []
+        
+        for addr in self.addresses:
+            air_summary = self.air_dbs[addr].get_summary()
+            weather_summary = self.weather_dbs[addr].get_summary()
+            
+            if air_summary and air_summary.get('total_records', 0) > 0:
+                stats.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5': air_summary.get('avg_pm2_5', 0),
+                    'PM10': air_summary.get('avg_pm10', 0),
+                    'NO₂': air_summary.get('avg_no2', 0),
+                    'O₃': air_summary.get('avg_o3', 0),
+                    'Temp': weather_summary.get('avg_temp', 0) if weather_summary else 0,
+                    'Records Air': air_summary['total_records'],
+                    'Records Météo': weather_summary.get('total_records', 0) if weather_summary else 0
+                })
+        
+        if not stats:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(stats)
+        
+        # Calculer les écarts par rapport à la meilleure adresse
+        for col in ['PM2.5', 'PM10', 'NO₂', 'O₃']:
+            if col in df.columns:
+                best_val = df[col].min()
+                df[f'Écart {col} (%)'] = ((df[col] - best_val) / best_val * 100).round(1)
+        
+        return df
+    
+    def export_to_excel(self) -> io.BytesIO:
+        """
+        Exporter toutes les données de comparaison vers Excel
+        """
+        output = io.BytesIO()
+        
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            # Onglet 1: Résumé qualité air
+            df_air = self.compare_air_quality()
+            if not df_air.empty:
+                df_air.to_excel(writer, sheet_name='Qualité Air', index=False)
+            
+            # Onglet 2: Résumé météo
+            df_weather = self.compare_weather()
+            if not df_weather.empty:
+                df_weather.to_excel(writer, sheet_name='Météo', index=False)
+            
+            # Onglet 3: Statistiques comparatives
+            df_stats = self.get_comparative_stats()
+            if not df_stats.empty:
+                df_stats.to_excel(writer, sheet_name='Statistiques', index=False)
+            
+            # Onglet 4: Classement
+            rankings = self.get_ranking()
+            ranking_data = []
+            for criterion, values in rankings.items():
+                for rank, (addr, val) in enumerate(values, 1):
+                    ranking_data.append({
+                        'Critère': criterion,
+                        'Rang': rank,
+                        'Adresse': addr,
+                        'Valeur': round(val, 2)
+                    })
+            
+            if ranking_data:
+                df_ranking = pd.DataFrame(ranking_data)
+                df_ranking.to_excel(writer, sheet_name='Classements', index=False)
+        
+        output.seek(0)
+        return output
+    
+    def compare_air_quality(self) -> pd.DataFrame:
+        """
+        Comparaison qualité air entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5 (µg/m³)': round(summary.get('avg_pm2_5', 0), 1),
+                    'PM10 (µg/m³)': round(summary.get('avg_pm10', 0), 1),
+                    'NO₂ (µg/m³)': round(summary.get('avg_no2', 0), 1),
+                    'O₃ (µg/m³)': round(summary.get('avg_o3', 0), 1),
+                    'Records': summary['total_records'],
+                    'Stations': summary['num_stations']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def compare_weather(self) -> pd.DataFrame:
+        """
+        Comparaison météo entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                # Fonction helper pour arrondir seulement si non-None
+                def safe_round(value, decimals=1):
+                    return round(value, decimals) if value is not None else 0.0
+                
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'Temp. moy (°C)': safe_round(summary.get('avg_temp')),
+                    'Temp. min (°C)': safe_round(summary.get('min_temp')),
+                    'Temp. max (°C)': safe_round(summary.get('max_temp')),
+                    'Vent moy (km/h)': safe_round(summary.get('avg_wind')),
+                    'Humidité (%)': safe_round(summary.get('avg_humidity')),
+                    'Records': summary['total_records']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def plot_pollutant_comparison(self, pollutant: str) -> go.Figure:
+        """
+        Graphique comparatif évolution temporelle d'un polluant
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.air_dbs[addr].get_pollutant_data(pollutant)
+            
+            if not df.empty:
+                # Agréger par jour pour lisibilité
+                df_daily = df.set_index('timestamp').resample('D')['value'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['value'],
+                    mode='lines+markers',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2),
+                    marker=dict(size=4)
+                ))
+        
+        fig.update_layout(
+            title=f"Comparaison {pollutant.upper()} - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Concentration (µg/m³)",
+            hovermode='x unified',
+            template='plotly_white',
+            legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02)
+        )
+        
+        return fig
+    
+    def plot_radar_comparison(self) -> go.Figure:
+        """
+        Radar chart normalisé multi-adresses
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if not summary or summary.get('total_records', 0) == 0:
+                continue
+            
+            # Normalisation 0-100 (100 = meilleur)
+            scores = {
+                'PM2.5': max(0, 100 - (summary.get('avg_pm2_5', 0) / 75 * 100)),
+                'PM10': max(0, 100 - (summary.get('avg_pm10', 0) / 150 * 100)),
+                'NO₂': max(0, 100 - (summary.get('avg_no2', 0) / 340 * 100)),
+                'O₃': max(0, 100 - (summary.get('avg_o3', 0) / 380 * 100))
+            }
+            
+            fig.add_trace(go.Scatterpolar(
+                r=list(scores.values()),
+                theta=list(scores.keys()),
+                fill='toself',
+                name=addr[:20] + '...' if len(addr) > 20 else addr
+            ))
+        
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 100],
+                    ticksuffix='',
+                    tickmode='linear',
+                    tick0=0,
+                    dtick=20
+                )
+            ),
+            showlegend=True,
+            title="Score qualité air normalisé (100 = excellent)"
+        )
+        
+        return fig
+    
+    def plot_temperature_comparison(self) -> go.Figure:
+        """
+        Graphique comparatif température
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.weather_dbs[addr].get_all_data(limit=500)
+            
+            if not df.empty:
+                # Agréger par jour
+                df_daily = df.set_index('timestamp').resample('D')['temperature'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['temperature'],
+                    mode='lines',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2)
+                ))
+        
+        fig.update_layout(
+            title="Comparaison température - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Température (°C)",
+            hovermode='x unified',
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def get_ranking(self) -> Dict[str, List[tuple]]:
+        """
+        Classement adresses par critère
+        Retourne dict {critère: [(adresse, valeur), ...]}
+        """
+        rankings = {
+            'PM2.5': [],
+            'PM10': [],
+            'NO₂': [],
+            'O₃': [],
+            'Température': []
+        }
+        
+        # Qualité air
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['PM2.5'].append((addr, summary.get('avg_pm2_5', float('inf'))))
+                rankings['PM10'].append((addr, summary.get('avg_pm10', float('inf'))))
+                rankings['NO₂'].append((addr, summary.get('avg_no2', float('inf'))))
+                rankings['O₃'].append((addr, summary.get('avg_o3', float('inf'))))
+        
+        # Météo
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['Température'].append((addr, summary.get('avg_temp', 0)))
+        
+        # Trier (du meilleur au pire)
+        for key in ['PM2.5', 'PM10', 'NO₂']:
+            rankings[key].sort(key=lambda x: x[1])  # Croissant = meilleur
+        
+        rankings['O₃'].sort(key=lambda x: abs(x[1] - 100))  # Proche de 100 = meilleur
+        rankings['Température'].sort(key=lambda x: abs(x[1] - 20))  # Proche de 20°C
+        
+        return rankings
+    
+    def create_comparison_map(self) -> folium.Map:
+        """
+        Crée une carte avec toutes les adresses comparées
+        """
+        if not self.addresses_coords:
+            return None
+        
+        # Calculer le centre de la carte (moyenne des coordonnées)
+        lats = [coords['lat'] for coords in self.addresses_coords.values()]
+        lons = [coords['lon'] for coords in self.addresses_coords.values()]
+        
+        center_lat = sum(lats) / len(lats)
+        center_lon = sum(lons) / len(lons)
+        
+        # Créer la carte
+        m = folium.Map(
+            location=[center_lat, center_lon],
+            zoom_start=12,
+            tiles="OpenStreetMap"
+        )
+        
+        # Ajouter les marqueurs pour chaque adresse avec des couleurs différentes
+        colors = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige', 'darkblue', 'darkgreen']
+        
+        for idx, (addr, coords) in enumerate(self.addresses_coords.items()):
+            color = colors[idx % len(colors)]
+            
+            # Récupérer le score de qualité air
+            summary = self.air_dbs[addr].get_summary()
+            pm25 = summary.get('avg_pm2_5', 0) if summary else 0
+            pm10 = summary.get('avg_pm10', 0) if summary else 0
+            
+            # Déterminer l'icône selon la qualité
+            if pm25 < 12 and pm10 < 20:
+                icon = 'smile'
+            elif pm25 < 35 and pm10 < 50:
+                icon = 'meh'
+            else:
+                icon = 'frown'
+            
+            popup_html = f"""
+            <div style="font-family: Arial; width: 200px;">
+                <h4 style="color: {color};">📍 Adresse {idx + 1}</h4>
+                <p><b>{addr[:40]}...</b></p>
+                <hr>
+                <p><b>Qualité Air:</b></p>
+                <p>PM2.5: {pm25:.1f} µg/m³</p>
+                <p>PM10: {pm10:.1f} µg/m³</p>
+            </div>
+            """
+            
+            folium.Marker(
+                [coords['lat'], coords['lon']],
+                popup=folium.Popup(popup_html, max_width=250),
+                tooltip=f"Adresse {idx + 1}",
+                icon=folium.Icon(color=color, icon=icon, prefix='fa')
+            ).add_to(m)
+        
+        return m
+    
+    def get_comparative_stats(self) -> pd.DataFrame:
+        """
+        Statistiques comparatives détaillées avec écarts
+        """
+        stats = []
+        
+        for addr in self.addresses:
+            air_summary = self.air_dbs[addr].get_summary()
+            weather_summary = self.weather_dbs[addr].get_summary()
+            
+            if air_summary and air_summary.get('total_records', 0) > 0:
+                stats.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5': air_summary.get('avg_pm2_5', 0),
+                    'PM10': air_summary.get('avg_pm10', 0),
+                    'NO₂': air_summary.get('avg_no2', 0),
+                    'O₃': air_summary.get('avg_o3', 0),
+                    'Temp': weather_summary.get('avg_temp', 0) if weather_summary else 0,
+                    'Records Air': air_summary['total_records'],
+                    'Records Météo': weather_summary.get('total_records', 0) if weather_summary else 0
+                })
+        
+        if not stats:
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(stats)
+        
+        # Calculer les écarts par rapport à la meilleure adresse
+        for col in ['PM2.5', 'PM10', 'NO₂', 'O₃']:
+            if col in df.columns:
+                best_val = df[col].min()
+                df[f'Écart {col} (%)'] = ((df[col] - best_val) / best_val * 100).round(1)
+        
+        return df
+    
+
+    
+    def compare_air_quality(self) -> pd.DataFrame:
+        """
+        Comparaison qualité air entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'PM2.5 (µg/m³)': round(summary.get('avg_pm2_5', 0), 1),
+                    'PM10 (µg/m³)': round(summary.get('avg_pm10', 0), 1),
+                    'NO₂ (µg/m³)': round(summary.get('avg_no2', 0), 1),
+                    'O₃ (µg/m³)': round(summary.get('avg_o3', 0), 1),
+                    'Records': summary['total_records'],
+                    'Stations': summary['num_stations']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def compare_weather(self) -> pd.DataFrame:
+        """
+        Comparaison météo entre adresses
+        """
+        comparison = []
+        
+        for addr in self.addresses:
+            summary = self.weather_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                # Fonction helper pour arrondir seulement si non-None
+                def safe_round(value, decimals=1):
+                    return round(value, decimals) if value is not None else 0.0
+                
+                comparison.append({
+                    'Adresse': addr[:30] + '...' if len(addr) > 30 else addr,
+                    'Temp. moy (°C)': safe_round(summary.get('avg_temp')),
+                    'Temp. min (°C)': safe_round(summary.get('min_temp')),
+                    'Temp. max (°C)': safe_round(summary.get('max_temp')),
+                    'Vent moy (km/h)': safe_round(summary.get('avg_wind')),
+                    'Humidité (%)': safe_round(summary.get('avg_humidity')),
+                    'Records': summary['total_records']
+                })
+        
+        return pd.DataFrame(comparison)
+    
+    def plot_pollutant_comparison(self, pollutant: str) -> go.Figure:
+        """
+        Graphique comparatif évolution temporelle d'un polluant
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.air_dbs[addr].get_pollutant_data(pollutant)
+            
+            if not df.empty:
+                # Agréger par jour pour lisibilité
+                df_daily = df.set_index('timestamp').resample('D')['value'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['value'],
+                    mode='lines+markers',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2),
+                    marker=dict(size=4)
+                ))
+        
+        fig.update_layout(
+            title=f"Comparaison {pollutant.upper()} - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Concentration (µg/m³)",
+            hovermode='x unified',
+            template='plotly_white',
+            legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02)
+        )
+        
+        return fig
+    
+    def plot_radar_comparison(self) -> go.Figure:
+        """
+        Radar chart normalisé multi-adresses
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if not summary or summary.get('total_records', 0) == 0:
+                continue
+            
+            # Normalisation 0-100 (100 = meilleur)
+            scores = {
+                'PM2.5': max(0, 100 - (summary.get('avg_pm2_5', 0) / 75 * 100)),
+                'PM10': max(0, 100 - (summary.get('avg_pm10', 0) / 150 * 100)),
+                'NO₂': max(0, 100 - (summary.get('avg_no2', 0) / 340 * 100)),
+                'O₃': max(0, 100 - (summary.get('avg_o3', 0) / 380 * 100))
+            }
+            
+            fig.add_trace(go.Scatterpolar(
+                r=list(scores.values()),
+                theta=list(scores.keys()),
+                fill='toself',
+                name=addr[:20] + '...' if len(addr) > 20 else addr
+            ))
+        
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(
+                    visible=True,
+                    range=[0, 100],
+                    ticksuffix='',
+                    tickmode='linear',
+                    tick0=0,
+                    dtick=20
+                )
+            ),
+            showlegend=True,
+            title="Score qualité air normalisé (100 = excellent)"
+        )
+        
+        return fig
+    
+    def plot_temperature_comparison(self) -> go.Figure:
+        """
+        Graphique comparatif température
+        """
+        fig = go.Figure()
+        
+        for addr in self.addresses:
+            df = self.weather_dbs[addr].get_all_data(limit=500)
+            
+            if not df.empty:
+                # Agréger par jour
+                df_daily = df.set_index('timestamp').resample('D')['temperature'].mean().reset_index()
+                
+                fig.add_trace(go.Scatter(
+                    x=df_daily['timestamp'],
+                    y=df_daily['temperature'],
+                    mode='lines',
+                    name=addr[:20] + '...' if len(addr) > 20 else addr,
+                    line=dict(width=2)
+                ))
+        
+        fig.update_layout(
+            title="Comparaison température - Moyenne journalière",
+            xaxis_title="Date",
+            yaxis_title="Température (°C)",
+            hovermode='x unified',
+            template='plotly_white'
+        )
+        
+        return fig
+    
+    def get_ranking(self) -> Dict[str, List[tuple]]:
+        """
+        Classement adresses par critère
+        Retourne dict {critère: [(adresse, valeur), ...]}
+        """
+        rankings = {
+            'PM2.5': [],
+            'PM10': [],
+            'NO₂': [],
+            'O₃': [],
+            'Température': []
+        }
+        
+        # Qualité air
+        for addr in self.addresses:
+            summary = self.air_dbs[addr].get_summary()
+            
+            if summary and summary.get('total_records', 0) > 0:
+                rankings['PM2.5'].append((addr, summary.get('avg_pm2_5', float('inf'))))
+                rankings['PM10'].append((addr, summary.get('avg_pm10', float('inf'))))
+                rankings['NO₂'].append((addr, summary.get('avg_no2', float('inf'))))
+                rankings['O₃'].

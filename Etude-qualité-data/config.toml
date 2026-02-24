@@ -1,0 +1,36 @@
+# Configuration Streamlit - Qualité de l'Air Bruxelles
+
+[theme]
+primaryColor = "#00a86b"        # Vert pour air "clean"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[server]
+port = 8501
+enableCORS = false
+enableXsrfProtection = true
+maxUploadSize = 200
+enableWebsocketCompression = true
+
+[browser]
+gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8501
+
+[runner]
+magicEnabled = true
+fastReruns = true
+
+[logger]
+level = "info"
+messageFormat = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+[client]
+showErrorDetails = true
+toolbarMode = "auto"
+
+[deprecation]
+showPyplotGlobalUse = false
+showfileUploaderEncoding = false

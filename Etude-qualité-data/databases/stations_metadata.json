@@ -1,0 +1,25 @@
+[
+  {
+    "session_timestamp": "2025-11-27T22:37:37.573527",
+    "location": {
+      "address": "Test",
+      "latitude": 50.8503,
+      "longitude": 4.3517
+    },
+    "stations_used": [
+      {
+        "station_id": "1110",
+        "station_name": "41B004 - Bruxelles (Sainte-Catherine)",
+        "latitude": 50.850810536794775,
+        "longitude": 4.348587474273884,
+        "distance_km": 0.23,
+        "pollutants_measured": [
+          "no2",
+          "o3"
+        ],
+        "timestamp": "2025-11-27T22:37:37.387123"
+      }
+    ],
+    "total_stations": 1
+  }
+]
