@@ -1,0 +1,79 @@
+================================================================================
+RAPPORT DE VALIDATION - MÉTA-SCORE QeV
+Tests de Fiabilité et Robustesse
+================================================================================
+
+Date: 04/12/2025 14:51:52
+
+--------------------------------------------------------------------------------
+1. ANALYSE DE SENSIBILITÉ
+--------------------------------------------------------------------------------
+
+Résumé:
+  • Changement moyen de rang: 91.00
+  • Changement max de rang: 120
+  • MAE moyen des scores: 0.0272
+  • Modèle robuste: ⚠️ NON
+
+Interprétation:
+⚠️ Le modèle montre une certaine SENSIBILITÉ aux poids. Il est recommandé
+de justifier les pondérations choisies par la littérature ou par un
+consensus d'experts (méthode Delphi).
+
+--------------------------------------------------------------------------------
+2. COHÉRENCE INTERNE
+--------------------------------------------------------------------------------
+
+a) Multicolinéarité Air-Trafic: -0.350
+   Statut: Multicolinéarité acceptable (<0.9)
+
+b) Contributions au score final:
+   • Air: 0.501
+   • Trafic: 0.435
+   • Vert: 0.696
+   Ratio max/min: 1.60
+   Statut: Contributions équilibrées
+
+c) Variance expliquée (R²): 1.0000
+   Statut: Excellent (>0.95)
+
+--------------------------------------------------------------------------------
+3. CAPACITÉ DISCRIMINANTE
+--------------------------------------------------------------------------------
+
+a) Coefficient de variation: 0.181
+   Statut: Bonne discrimination
+
+b) Entropie normalisée: 0.779
+   Statut: Distribution diverse
+
+c) Séparation extrêmes (P90-P10): 0.216
+   Statut: Séparation faible (<0.3)
+
+--------------------------------------------------------------------------------
+4. ROBUSTESSE AUX VALEURS EXTRÊMES
+--------------------------------------------------------------------------------
+
+pollution_max: Score = 0.000
+  → Score cohérent (proche de 0)
+
+conditions_ideal: Score = 0.971
+  → Score cohérent (proche de 1)
+
+Écart entre extrêmes: 0.970
+  → Bonne discrimination extrêmes (>0.5)
+
+--------------------------------------------------------------------------------
+5. CONCLUSION GÉNÉRALE
+--------------------------------------------------------------------------------
+
+⚠️ Le méta-score QeV présente quelques points d'attention:
+
+• Sensibilité aux poids de pondération
+
+Recommandations:
+• Justifier les pondérations par la littérature
+• Effectuer une analyse de sensibilité dans le rapport
+• Discuter les limites en transparence
+
+================================================================================

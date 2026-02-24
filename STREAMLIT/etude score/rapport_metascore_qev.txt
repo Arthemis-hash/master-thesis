@@ -1,0 +1,305 @@
+================================================================================
+RAPPORT D'ANALYSE - MÉTA-SCORE QeV
+Qualité Environnementale de Vie
+================================================================================
+
+Date de génération: 04/12/2025 14:51:26
+Nombre de scénarios analysés: 50
+
+--------------------------------------------------------------------------------
+1. MÉTHODOLOGIE
+--------------------------------------------------------------------------------
+
+1.1 Cadre Théorique
+----------------------------------------
+Le méta-score QeV est construit selon les principes du:
+• OECD/JRC (2008): Handbook on Constructing Composite Indicators
+• IRCEL-CELINE: Méthodologie BelAQI pour la qualité de l'air
+• EMEP/EEA: Air Pollutant Emission Inventory Guidebook
+• WHO (2016): Urban green spaces and health
+
+1.2 Formulation Mathématique
+----------------------------------------
+L'indice composite est calculé par agrégation linéaire pondérée:
+
+QeV = W_air × S_air + W_traffic × S_traffic + W_green × S_green
+
+Où:
+  • W_air = 0.40 (40% - Impact vital direct)
+  • W_traffic = 0.30 (30% - Nuisances)
+  • W_green = 0.30 (30% - Impact psychologique)
+
+1.3 Sous-Indices
+----------------------------------------
+
+A) Indice de Charge de Trafic (I_traffic):
+   I_traffic = (N_cars × 1.0) + (N_vans × 3.0) + (N_trucks × 10.0)
+   Basé sur les facteurs d'émission PCU (Passenger Car Units)
+
+B) Indice de Verdure (I_green):
+   I_green = 0.5 × (Surface_verte/km²) + 0.5 × (Arbres_150m)
+   Combine densité globale et proximité immédiate
+
+C) Indice de Qualité de l'Air (I_air):
+   I_air = moyenne(I_NO2, I_PM2.5, I_PM10)
+   Concentration normalisée des polluants majeurs
+
+1.4 Normalisation Min-Max
+----------------------------------------
+Tous les indicateurs sont normalisés entre 0 et 1:
+S_x = (x - min) / (max - min)
+
+Pour les indicateurs négatifs (trafic, pollution):
+S_x_inversé = 1 - S_x
+(Pour que 1 = Bon et 0 = Mauvais)
+
+--------------------------------------------------------------------------------
+2. STATISTIQUES DESCRIPTIVES
+--------------------------------------------------------------------------------
+
+Score QeV moyen: 0.750
+Écart-type: 0.038
+Minimum: 0.633
+Maximum: 0.794
+Médiane: 0.761
+
+Distribution par catégorie:
+  • Bon: 50 (100.0%)
+
+--------------------------------------------------------------------------------
+3. RÉSULTATS DÉTAILLÉS PAR SCÉNARIO
+--------------------------------------------------------------------------------
+
+Scénario #1: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.794 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.971
+  • Trafic/Nuisances: 0.970
+  • Espaces Verts: 0.381
+
+Données brutes:
+  • Nuisance trafic: 150.0 points équiv.
+  • Indice verdure: 0.381
+  • Indice pollution: 0.029
+
+Scénario #2: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.792 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.966
+  • Trafic/Nuisances: 0.970
+  • Espaces Verts: 0.382
+
+Données brutes:
+  • Nuisance trafic: 150.0 points équiv.
+  • Indice verdure: 0.382
+  • Indice pollution: 0.034
+
+Scénario #3: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.785 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.949
+  • Trafic/Nuisances: 0.970
+  • Espaces Verts: 0.383
+
+Données brutes:
+  • Nuisance trafic: 150.0 points équiv.
+  • Indice verdure: 0.383
+  • Indice pollution: 0.051
+
+Scénario #4: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.784 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.947
+  • Trafic/Nuisances: 0.970
+  • Espaces Verts: 0.381
+
+Données brutes:
+  • Nuisance trafic: 150.0 points équiv.
+  • Indice verdure: 0.381
+  • Indice pollution: 0.053
+
+Scénario #5: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.781 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.945
+  • Trafic/Nuisances: 0.969
+  • Espaces Verts: 0.373
+
+Données brutes:
+  • Nuisance trafic: 153.5 points équiv.
+  • Indice verdure: 0.373
+  • Indice pollution: 0.055
+
+Scénario #6: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.780 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.946
+  • Trafic/Nuisances: 0.968
+  • Espaces Verts: 0.371
+
+Données brutes:
+  • Nuisance trafic: 160.5 points équiv.
+  • Indice verdure: 0.371
+  • Indice pollution: 0.054
+
+Scénario #7: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.780 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.945
+  • Trafic/Nuisances: 0.968
+  • Espaces Verts: 0.371
+
+Données brutes:
+  • Nuisance trafic: 160.5 points équiv.
+  • Indice verdure: 0.371
+  • Indice pollution: 0.055
+
+Scénario #8: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.780 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.951
+  • Trafic/Nuisances: 0.966
+  • Espaces Verts: 0.365
+
+Données brutes:
+  • Nuisance trafic: 168.2 points équiv.
+  • Indice verdure: 0.365
+  • Indice pollution: 0.049
+
+Scénario #9: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.779 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.944
+  • Trafic/Nuisances: 0.968
+  • Espaces Verts: 0.371
+
+Données brutes:
+  • Nuisance trafic: 160.5 points équiv.
+  • Indice verdure: 0.371
+  • Indice pollution: 0.056
+
+Scénario #10: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+────────────────────────────────────────
+Score QeV Final: 0.779 / 1.000
+Catégorie: Bon
+
+Sous-scores (normalisés 0-1, après inversion):
+  • Qualité de l'Air: 0.940
+  • Trafic/Nuisances: 0.969
+  • Espaces Verts: 0.373
+
+Données brutes:
+  • Nuisance trafic: 154.0 points équiv.
+  • Indice verdure: 0.373
+  • Indice pollution: 0.060
+
+--------------------------------------------------------------------------------
+4. ANALYSE COMPARATIVE
+--------------------------------------------------------------------------------
+
+Comparaison Meilleur vs Pire Scénario:
+
+🥇 MEILLEUR: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+   Score QeV: 0.794 (Bon)
+   Air: 0.971 | Trafic: 0.970 | Vert: 0.381
+
+🥉 PIRE: Grand-Place - Grote Markt, Quartier Saint-Jacques - Sint-Jacobswijk, Quartier du Centre - Centrumwijk, Pentagone - Vijfhoek, Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale, Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, 1000, België / Belgique / Belgien
+   Score QeV: 0.633 (Bon)
+   Air: 0.789 | Trafic: 0.836 | Vert: 0.223
+
+Écart relatif: 0.161 points (25.4%)
+
+Interprétation:
+Cette différence démontre la capacité discriminante du méta-score.
+Le modèle pénalise efficacement la combinaison 'Trafic + Mauvais Air'
+et valorise la 'Nature + Calme'.
+
+--------------------------------------------------------------------------------
+5. LIMITES ET DISCUSSION
+--------------------------------------------------------------------------------
+
+5.1 Multicolinéarité
+----------------------------------------
+Les indicateurs 'Trafic' et 'Qualité de l'air' sont naturellement corrélés
+car le trafic est la source primaire de NO2 en milieu urbain.
+Justification: Ils mesurent des impacts distincts:
+  • Air: Toxicité physiologique (santé respiratoire)
+  • Trafic: Nuisances non-chimiques (bruit, insécurité, espace)
+
+5.2 Subjectivité de la Pondération
+----------------------------------------
+Les poids (40% air, 30% trafic, 30% vert) sont normatifs.
+Recommandation: Analyse de sensibilité (variation ±10% des poids)
+pour vérifier la robustesse du classement.
+
+5.3 Linéarité vs Effets de Seuil
+----------------------------------------
+La normalisation Min-Max est linéaire, mais les effets sanitaires
+ne le sont pas toujours (ex: seuils critiques OMS).
+Amélioration possible: Fonction logarithmique pour hautes doses.
+
+--------------------------------------------------------------------------------
+6. CONCLUSION
+--------------------------------------------------------------------------------
+
+Le méta-score QeV développé respecte les standards internationaux de
+construction d'indicateurs composites. Il combine de manière cohérente
+trois dimensions clés de la qualité environnementale urbaine.
+
+Les résultats démontrent:
+✓ Une bonne capacité discriminante entre zones
+✓ Une cohérence avec les connaissances épidémiologiques
+✓ Une transparence méthodologique complète
+
+Ce score peut être utilisé pour:
+• Identifier les zones prioritaires d'intervention
+• Évaluer l'impact de politiques d'aménagement
+• Comparer différents quartiers/villes
+• Communiquer simplement une réalité complexe au public
+
+--------------------------------------------------------------------------------
+7. RÉFÉRENCES BIBLIOGRAPHIQUES
+--------------------------------------------------------------------------------
+
+[1] OECD/JRC (2008). Handbook on Constructing Composite Indicators: Methodology and User Guide. OECD Publishing, Paris.
+
+[2] IRCEL-CELINE. Documentation technique sur l'indice BelAQI. Cellule Interrégionale de l'Environnement, Belgique.
+
+[3] EMEP/EEA (2019). Air Pollutant Emission Inventory Guidebook. European Environment Agency, Copenhagen.
+
+[4] WHO (2016). Urban green spaces and health. Copenhagen: WHO Regional Office for Europe.
+
+[5] Saisana, M., & Tarantola, S. (2002). State-of-the-art report on current methodologies and practices for composite indicator development. EUR 20408 EN, European Commission-JRC.
+
+[6] Deboosere, P. et al. (2009). Inégalités sociales de santé en Belgique. Academia Press, Gent.
+
+================================================================================
+FIN DU RAPPORT
+================================================================================

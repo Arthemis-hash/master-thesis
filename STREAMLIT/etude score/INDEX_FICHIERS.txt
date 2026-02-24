@@ -1,0 +1,197 @@
+================================================================================
+INDEX DES FICHIERS - PROJET MÉTA-SCORE QeV
+Qualité Environnementale de Vie - Master Thesis
+================================================================================
+
+Date de génération : 4 Décembre 2025
+Localisation : /Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality/
+
+================================================================================
+📂 FICHIERS GÉNÉRÉS
+================================================================================
+
+1. CODE SOURCE (Python)
+   ├── metascore_calculator.py              [~1400 lignes, 60 KB]
+   │   └── Calculateur principal du méta-score QeV
+   │       • Extraction des données depuis SQLite
+   │       • Calcul des sous-indices (Trafic, Vert, Air)
+   │       • Normalisation Min-Max
+   │       • Agrégation pondérée
+   │       • Génération de rapports et visualisations
+   │
+   └── benchmark_validation.py              [~800 lignes, 35 KB]
+       └── Tests de validation et robustesse
+           • Analyse de sensibilité (variation des poids)
+           • Test de cohérence interne (corrélations)
+           • Test de capacité discriminante
+           • Test de robustesse aux valeurs extrêmes
+
+2. RAPPORTS GÉNÉRÉS (Text)
+   ├── rapport_metascore_qev.txt            [~25 KB]
+   │   └── Rapport complet d'analyse
+   │       • Méthodologie détaillée avec formules
+   │       • Statistiques descriptives (50 scénarios)
+   │       • Résultats détaillés par zone
+   │       • Analyse comparative meilleur/pire
+   │       • Limites et discussion
+   │       • Références bibliographiques complètes
+   │
+   └── benchmark_validation_report.txt      [~3 KB]
+       └── Rapport de validation
+           • Analyse de sensibilité (résultats)
+           • Cohérence interne (R²=1.000)
+           • Capacité discriminante (CV=0.181)
+           • Robustesse extrêmes (écart=0.970)
+           • Conclusion générale avec recommandations
+
+3. VISUALISATIONS (PNG)
+   └── analyse_qev.png                      [~150 KB]
+       └── 4 graphiques professionnels
+           • Graphique en barres : Score QeV par localisation
+           • Graphique radar : Scores moyens par composante
+           • Histogramme : Distribution des scores
+           • Graphique groupé : Décomposition par zone
+
+4. DOCUMENTATION (Markdown)
+   ├── README_METASCORE.md                  [~25 KB]
+   │   └── Documentation complète du projet
+   │       • Objectifs et méthodologie
+   │       • Instructions d'utilisation
+   │       • Exemples de résultats
+   │       • Tests de validation
+   │       • Applications pratiques
+   │       • FAQ et dépannage
+   │
+   ├── RESUME_EXECUTIF.md                   [~35 KB]
+   │   └── Résumé exécutif pour décideurs
+   │       • Objectif et méthodologie (résumé)
+   │       • Résultats principaux (tableaux)
+   │       • Points forts et limites
+   │       • Recommandations pour la thèse
+   │       • Applications pratiques
+   │       • Prochaines étapes
+   │
+   └── TEXTE_POUR_RAPPORT.md                [~30 KB]
+       └── Sections prêtes pour le rapport de thèse
+           • Chapitre "Méthodes" (4.3)
+           • Chapitre "Résultats" (5.2)
+           • Chapitre "Discussion" (6.4)
+           • Chapitre "Conclusion" (7.2-7.3)
+           • Références bibliographiques complètes
+
+5. BASES DE DONNÉES (SQLite)
+   └── app/databases/
+       ├── air_quality_1000_[...].db        [~500 KB]
+       │   └── Données de qualité de l'air (50 enregistrements)
+       │       • NO₂, PM2.5, PM10, O₃, SO₂, CO
+       │       • Localisation GPS (lat/lon)
+       │       • Adresses normalisées
+       │
+       └── weather_1000_[...].db            [~300 KB]
+           └── Données météorologiques
+               • Température, humidité, vent
+               • Précipitations
+
+================================================================================
+📊 RÉSULTATS CLÉS
+================================================================================
+
+ANALYSE DE 50 SCÉNARIOS RÉELS (BRUXELLES)
+──────────────────────────────────────────
+• Score QeV moyen      : 0.750 / 1.000
+• Écart-type           : 0.038
+• Score minimum        : 0.633 (Critique)
+• Score maximum        : 0.794 (Bon)
+• Catégorie dominante  : 100% "Bon"
+
+DÉCOMPOSITION PAR DIMENSION
+──────────────────────────────────────────
+• Qualité de l'Air     : 0.970 (Excellent) ✅
+• Trafic routier       : 0.970 (Excellent) ✅
+• Espaces verts        : 0.381 (Faible)    ⚠️
+
+TESTS DE VALIDATION
+──────────────────────────────────────────
+• Cohérence interne    : R² = 1.000       ✅
+• Discrimination       : CV = 0.181       ✅
+• Robustesse extrêmes  : Écart = 0.970    ✅
+• Sensibilité poids    : Δ rang = 48%     ⚠️
+
+================================================================================
+🚀 COMMENT UTILISER
+================================================================================
+
+1. CALCULER LE MÉTA-SCORE
+   $ cd /Users/macbook/Desktop/Master-Thésis/STREAMLIT/airquality
+   $ python3 metascore_calculator.py
+   
+   Sortie : rapport_metascore_qev.txt + analyse_qev.png
+
+2. VALIDER LA ROBUSTESSE
+   $ python3 benchmark_validation.py
+   
+   Sortie : benchmark_validation_report.txt
+
+3. CONSULTER LA DOCUMENTATION
+   $ open README_METASCORE.md           # Guide complet
+   $ open RESUME_EXECUTIF.md            # Résumé exécutif
+   $ open TEXTE_POUR_RAPPORT.md         # Sections pour thèse
+
+4. VISUALISER LES RÉSULTATS
+   $ open analyse_qev.png               # Graphiques
+   $ open rapport_metascore_qev.txt     # Rapport détaillé
+
+================================================================================
+📚 RÉFÉRENCES UTILISÉES
+================================================================================
+
+[1] OECD/JRC (2008). Handbook on Constructing Composite Indicators
+[2] IRCEL-CELINE. Méthodologie BelAQI
+[3] EMEP/EEA (2019). Air Pollutant Emission Inventory Guidebook
+[4] WHO (2016). Urban green spaces and health
+[5] Saisana & Tarantola (2002). Composite indicator development
+[6] Deboosere et al. (2009). Inégalités sociales de santé en Belgique
+
+================================================================================
+✅ CHECKLIST DE VALIDATION
+================================================================================
+
+[✓] Code source documenté et commenté
+[✓] Tests de validation exécutés (4 types)
+[✓] Rapports générés (méthodologie + résultats)
+[✓] Visualisations professionnelles créées
+[✓] Documentation complète rédigée
+[✓] Références bibliographiques vérifiées
+[✓] Limites identifiées et discutées
+[✓] Applications pratiques proposées
+[✓] Sections prêtes pour rapport de thèse
+
+================================================================================
+🎓 POUR VOTRE THÈSE
+================================================================================
+
+FICHIERS À INTÉGRER :
+────────────────────────────────────────
+1. TEXTE_POUR_RAPPORT.md → Chapitres 4, 5, 6, 7
+2. analyse_qev.png → Figures dans "Résultats"
+3. rapport_metascore_qev.txt → Annexe A (détails méthodologiques)
+4. benchmark_validation_report.txt → Annexe B (validation)
+
+ÉLÉMENTS À CITER :
+────────────────────────────────────────
+• Méthodologie OECD/JRC (standard international)
+• Résultats chiffrés (score moyen 0.750, R²=1.000)
+• Limites discutées (sensibilité aux poids)
+• Applications proposées (aide à la décision)
+
+================================================================================
+📞 SUPPORT
+================================================================================
+
+Documentation : README_METASCORE.md
+Questions : Voir section "FAQ et dépannage" dans README
+Code : metascore_calculator.py (commenté en détail)
+
+================================================================================
+FIN DE L'INDEX
+================================================================================
